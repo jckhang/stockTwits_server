@@ -2,12 +2,7 @@
 
 ## Dependency
 
-First you must have [virtualenv](https://virtualenv.pypa.io/en/latest/installation.html) installed on your computer,
-```
-    virtualenv venv          # make venv directory
-    source venv/bin/activate # activate the venv
-```
-Then install dependency to venv,
+Install dependency to venv,
 ```
     pip install -r requirements.txt
 ```
