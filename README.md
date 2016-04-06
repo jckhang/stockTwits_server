@@ -2,7 +2,7 @@
 
 ## Dependency
 
-Install dependency to your computer,
+Install dependency to your computer ,
 ```
     pip install -r requirements.txt
 ```
