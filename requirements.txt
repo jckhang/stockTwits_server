@@ -7,6 +7,7 @@ Eve==0.6.3
 Events==0.2.1
 Flask==0.10.1
 Flask-PyMongo==0.4.1
+gunicorn==19.4.5
 itsdangerous==0.24
 Jinja2==2.8
 kombu==3.0.35
