@@ -1,25 +1,40 @@
 from flask import Flask
 from flask import render_template
 from flask import request
+from flask import json
 from flask import jsonify
-from bson.json_util import dumps
+from flask import Response
+from bson import json_util
 from pipelines import MONGODBPipeline
 
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 db = MONGODBPipeline()
-
+TODOS = {
+    'todo1': {'task': 'build an API'},
+    'todo2': {'task': '?????'},
+    'todo3': {'task': 'profit!'},
+}
 
 @app.route("/")
 def home():
     return render_template("home.html", name="home")
 
 
-@app.route("/symbol", methods=["GET"])
-def stocks():
-    resp = dumps([i for i in db.info_collection.find({})])
-    return resp
+@app.route("/sectors", methods=["GET"])
+def section():
+    if not('sector' in request.args) or (request.args['sector']=='all'):
+        sector = "S&P 100 Index Symbols"
+        data = [i for i in db.info_collection.find()]
+        return Response(json.dumps({sector: data}, default=json_util.default),
+                mimetype='application/json')
+
+    else:
+        sector = request.args['sector'][0].upper()+request.args['sector'][1:]+ " Sector Symbols"
+        data = [i for i in db.info_collection.find({'sector':request.args['sector']})]
+        return Response(json.dumps({sector: data}, default=json_util.default),
+                mimetype='application/json')
 
 
 @app.errorhandler(404)
