@@ -9,6 +9,7 @@ class MONGODBPipeline(object):
             connection = pymongo.MongoClient(
                 os.getenv('MONGOLAB_URI')
             )
+            print "connect heroku"
         else:
             connection = pymongo.MongoClient(
                 settings.MONGODB_URI
