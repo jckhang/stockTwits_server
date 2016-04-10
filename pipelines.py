@@ -7,7 +7,7 @@ class MONGODBPipeline(object):
     def __init__(self):
         if os.getenv('MONGOLAB_URI') is not None:
             connection = pymongo.MongoClient(
-                "mongodb://heroku_6nk70pz9:39obflvor8ubaa2n8pji4q2che@ds061974.mlab.com:61974/heroku_6nk70pz9"
+                "mongodb://user:123@ds061974.mlab.com:61974/heroku_6nk70pz9"
             )
             print "connect heroku"
         else:
