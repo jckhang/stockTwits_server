@@ -11,11 +11,6 @@ from pipelines import MONGODBPipeline
 app = Flask(__name__)
 app.config.from_object(__name__)
 db = MONGODBPipeline()
-TODOS = {
-    'todo1': {'task': 'build an API'},
-    'todo2': {'task': '?????'},
-    'todo3': {'task': 'profit!'},
-}
 
 @app.route("/")
 def home():
