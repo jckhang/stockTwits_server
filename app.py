@@ -6,11 +6,23 @@ from flask import jsonify
 from flask import Response
 from bson import json_util
 from pipelines import MONGODBPipeline
+from datetime import datetime
+from yahoo_finance import Share
 
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 db = MONGODBPipeline()
+timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+if db.info_collection.count() == 0:
+    with open('static/sp100.json', 'rb') as f:
+        ls = json.load(f)
+        for i in ls:
+            symbol = Share(i['name'])
+            i['price'] = symbol.get_price()
+            i['time'] = timestamp
+    result = db.info_collection.insert_many(ls)
+
 
 @app.route("/")
 def home():
@@ -19,17 +31,19 @@ def home():
 
 @app.route("/sectors", methods=["GET"])
 def section():
-    if not('sector' in request.args) or (request.args['sector']=='all'):
+    if not('sector' in request.args) or (request.args['sector'] == 'all'):
         sector = "S&P 100 Index Symbols"
         data = [i for i in db.info_collection.find()]
         return Response(json.dumps({sector: data}, default=json_util.default),
-                mimetype='application/json')
+                        mimetype='application/json')
 
     else:
-        sector = request.args['sector'][0].upper()+request.args['sector'][1:]+ " Sector Symbols"
-        data = [i for i in db.info_collection.find({'sector':request.args['sector']})]
+        sector = request.args['sector'][
+            0].upper() + request.args['sector'][1:] + " Sector Symbols"
+        data = [i for i in db.info_collection.find(
+            {'sector': request.args['sector']})]
         return Response(json.dumps({sector: data}, default=json_util.default),
-                mimetype='application/json')
+                        mimetype='application/json')
 
 
 @app.errorhandler(404)
