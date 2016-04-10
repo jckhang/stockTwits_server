@@ -21,6 +21,12 @@ if db.info_collection.count() == 0:
             symbol = Share(i['name'])
             i['price'] = symbol.get_price()
             i['time'] = timestamp
+            i['prev_close'] = symbol.get_prev_close()
+            i['open'] = symbol.get_open()
+            i['volume'] = symbol.get_volume()
+            i['price_earnings_ratio'] = symbol.get_price_earnings_ratio()
+            i['price_sales'] = symbol.get_price_sales()
+            i['ebitda'] = symbol.get_ebitda()
     result = db.info_collection.insert_many(ls)
 
 
