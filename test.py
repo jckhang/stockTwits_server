@@ -13,3 +13,4 @@ if db.info_collection.count() == 0:
             i['price'] = symbol.get_price()
             i['time'] = timestamp
     result = db.info_collection.insert_many(ls)
+print db.info_collection.count()

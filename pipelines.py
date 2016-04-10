@@ -13,6 +13,7 @@ class MONGODBPipeline(object):
             connection = pymongo.MongoClient(
                 settings.MONGODB_URI
             )
+            print "connect local"
         db = connection[settings.MONGODB_DB]
         self.info_collection = db[settings.MONGODB_COLLECTION[0]]
         self.twits_collection = db[settings.MONGODB_COLLECTION[1]]
