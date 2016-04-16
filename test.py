@@ -14,5 +14,3 @@
 #             i['time'] = timestamp
 #     result = db.info_collection.insert_many(ls)
 # print db.info_collection.count()
-import os
-print os.environ
