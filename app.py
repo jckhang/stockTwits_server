@@ -31,15 +31,17 @@ if db.info_collection.count() == 0:
             i['B/S'] = "NA"
     result = db.info_collection.insert_many(ls)
 
+# Route for homepage
+
 
 @app.route("/")
 def home():
     return render_template("home.html", name="home")
 
-
+Route for getting symbol within sector 
 @app.route("/sectors", methods=["GET"])
 def section():
-    if not('sector' in request.args) or (request.args['sector'] == 'all'):
+    if not('sector' in request.args) or (request.args['sector'] == 'All'):
         sector = "S&P 100 Index Symbols"
         data = [i for i in db.info_collection.find()]
         return Response(json.dumps({sector: data}, default=json_util.default),
