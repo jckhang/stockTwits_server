@@ -38,7 +38,9 @@ if db.info_collection.count() == 0:
 def home():
     return render_template("home.html", name="home")
 
-Route for getting symbol within sector 
+# Route for getting symbol within sector
+
+
 @app.route("/sectors", methods=["GET"])
 def section():
     if not('sector' in request.args) or (request.args['sector'] == 'All'):
