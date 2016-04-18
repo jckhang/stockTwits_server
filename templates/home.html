@@ -3,11 +3,15 @@
 {% block content %}
     <div class="{{ name }}-container">
         <p><b>Usage:</b></p>
+        <!-- Sector Filter API -->
         <a href="/sectors?sector=Technology"><b>GET /sectors?sector=Technology</b></a>
-        
         <p>Filter S&P 100 symbols based on sectors. By default is set to give back all the S&P 100 stocks.
         <br>For the full list of S&P 100 symbols and their sectors, read the table <a href="">S&P 100 Symbols</a></p>
-        <a href="/symbol"><b>GET /symbol</b></a>
+        <!-- Symbol Search API -->
+        <a href="/search?symbol=AAPL"><b>GET /search?symbol=AAPL</b></a>
+        <p>Search with symbol name and return the general information.</p>
+        <!-- Symbol Twits API -->
+        <a href="/twits?symbol=AAPL"><b>GET /twits?symbol=AAPL</b></a>
         <p>For the selected symbol, return the newest 30 twits from <a href="http://stocktwits.com/developers/docs/api">StockTwits API</a></p>
 
     </div>

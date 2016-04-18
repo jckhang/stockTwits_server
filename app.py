@@ -30,14 +30,21 @@ if db.info_collection.count() == 0:
             i['hottness'] = "NA"
             i['B/S'] = "NA"
     result = db.info_collection.insert_many(ls)
-
 # Route for homepage
 
 
 @app.route("/")
 def home():
     return render_template("home.html", name="home")
+# Route for searching specific symbol and it's general information
 
+
+@app.route("/search", methods=["GET"])
+def search():
+    name = request.args['symbol']
+    data = [i for i in db.info_collection.find({'name': name})]
+    return Response(json.dumps({'data': data}, default=json_util.default),
+                    mimetype='application/json')
 # Route for getting symbol within sector
 
 
@@ -56,6 +63,7 @@ def section():
             {'sector': request.args['sector']})]
         return Response(json.dumps({sector: data}, default=json_util.default),
                         mimetype='application/json')
+# Error Handler
 
 
 @app.errorhandler(404)
