@@ -27,6 +27,8 @@ if db.info_collection.count() == 0:
             i['price_earnings_ratio'] = symbol.get_price_earnings_ratio()
             i['price_sales'] = symbol.get_price_sales()
             i['ebitda'] = symbol.get_ebitda()
+            i['hottness'] = "NA"
+            i['B/S'] = "NA"
     result = db.info_collection.insert_many(ls)
 
 
