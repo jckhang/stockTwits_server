@@ -18,6 +18,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 db = MONGODBPipeline()
 
+
 def createDBstock():
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open('static/sp100.json', 'rb') as f:
