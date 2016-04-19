@@ -4,7 +4,7 @@ sched = BlockingScheduler()
 
 @sched.scheduled_job('interval', minutes=1)
 def timed_job():
-	createDBstock()
+    createDBstock()
     print('This job is run every one minutes.')
 
 #@sched.scheduled_job('cron', day_of_week='mon-fri', hour=17)
