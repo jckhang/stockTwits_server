@@ -65,7 +65,8 @@ def updateDBstock():
 
 @app.route("/dbsd")
 def deleteDBstock():
-    db.info_collection.delete_many()
+    db.info_collection.delete_many({})
+    return Response(jsonify({'message': 'Collection Info deleted.'}))
 # Route for homepage
 
 
