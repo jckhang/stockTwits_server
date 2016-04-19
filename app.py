@@ -11,6 +11,7 @@ from datetime import datetime
 from yahoo_finance import Share
 
 
+# Create Database Stock
 app = Flask(__name__)
 app.config.from_object(__name__)
 cors = CORS(app)
@@ -18,8 +19,31 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 db = MONGODBPipeline()
 
+# Create stock database
+
 
 def createDBstock():
+    if db.info_collection.count() == 0:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open('static/sp100.json', 'rb') as f:
+            ls = json.load(f)
+            for i in ls:
+                symbol = Share(i['name'])
+                i['price'] = symbol.get_price()
+                i['time'] = timestamp
+                i['prev_close'] = symbol.get_prev_close()
+                i['open'] = symbol.get_open()
+                i['volume'] = symbol.get_volume()
+                i['price_earnings_ratio'] = symbol.get_price_earnings_ratio()
+                i['price_sales'] = symbol.get_price_sales()
+                i['ebitda'] = symbol.get_ebitda()
+                i['hottness'] = "NA"
+                i['B/S'] = "NA"
+        print(db.info_collection.insert_many(ls))
+# Update Stock database
+
+
+def updateDBstock():
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open('static/sp100.json', 'rb') as f:
         ls = json.load(f)
@@ -35,14 +59,20 @@ def createDBstock():
             i['ebitda'] = symbol.get_ebitda()
             i['hottness'] = "NA"
             i['B/S'] = "NA"
-    result = db.info_collection.insert_many(ls)
-createDBstock()
+    print(db.info_collection.insert_many(ls))
+# Delete the record in stock database
+
+
+@app.route("/dbsd")
+def deleteDBstock():
+    db.info_collection.delete_many()
 # Route for homepage
 
 
 @app.route("/")
 def home():
     return render_template("home.html", name="home")
+
 # Route for searching specific symbol and it's general information
 
 
@@ -87,3 +117,4 @@ def not_found(error=None):
 
 if __name__ == "__main__":
     app.run(debug=True)
+    createDBstock()
