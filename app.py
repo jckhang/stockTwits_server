@@ -4,6 +4,7 @@ from flask import request
 from flask import json
 from flask import jsonify
 from flask import Response
+from flask.ext.cors import CORS, cross_origin
 from bson import json_util
 from pipelines import MONGODBPipeline
 from datetime import datetime
@@ -12,6 +13,9 @@ from yahoo_finance import Share
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
+
 db = MONGODBPipeline()
 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 if db.info_collection.count() == 0:
@@ -40,6 +44,7 @@ def home():
 
 
 @app.route("/search", methods=["GET"])
+@cross_origin()
 def search():
     name = request.args['symbol']
     data = [i for i in db.info_collection.find({'name': name})]
@@ -49,6 +54,7 @@ def search():
 
 
 @app.route("/sectors", methods=["GET"])
+@cross_origin()
 def section():
     if not('sector' in request.args) or (request.args['sector'] == 'All'):
         sector = "S&P 100 Index Symbols"
