@@ -18,7 +18,8 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 db = MONGODBPipeline()
 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-if db.info_collection.count() == 0:
+
+def createDBstock():
     with open('static/sp100.json', 'rb') as f:
         ls = json.load(f)
         for i in ls:
@@ -34,6 +35,7 @@ if db.info_collection.count() == 0:
             i['hottness'] = "NA"
             i['B/S'] = "NA"
     result = db.info_collection.insert_many(ls)
+createDBstock()
 # Route for homepage
 
 
