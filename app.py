@@ -40,6 +40,7 @@ def createDBstock():
                 i['hottness'] = "NA"
                 i['B/S'] = "NA"
         print(db.info_collection.insert_many(ls))
+createDBstock()
 # Update Stock database
 
 
@@ -118,4 +119,3 @@ def not_found(error=None):
 
 if __name__ == "__main__":
     app.run(debug=True)
-    createDBstock()
