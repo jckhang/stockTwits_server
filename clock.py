@@ -1,11 +1,11 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
-from app import createDBstock
+from app import updateDBstock
 sched = BlockingScheduler()
 
 
 @sched.scheduled_job('interval', minutes=10)
 def timed_job():
-    createDBstock()
+    updateDBstock()
     print('This job is run every one minutes.')
 
 
