@@ -136,7 +136,7 @@ def updateDBtwits():
                 item['body'] = msg['body']
                 item['id'] = msg['id']
                 item['time'] = msg['created_at']
-                db.info_collection.update(
+                db.twits_collection.update(
                     {"name": i['name']},
                     {
                         "$push": {"data": item}
