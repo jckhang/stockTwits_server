@@ -105,7 +105,7 @@ def section():
     else:
         sector = request.args['sector'][
             0].upper() + request.args['sector'][1:] + " Sector Symbols"
-        data = [i.data[len(i.data)] for i in db.info_collection.find(
+        data = [i['data'][len(i['data']) - 1] for i in db.info_collection.find(
             {'sector': request.args['sector']})]
         return Response(json.dumps({sector: data}, default=json_util.default),
                         mimetype='application/json')
