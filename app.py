@@ -139,7 +139,7 @@ def updateDBtwits():
                 db.info_collection.update(
                     {"name": i['name']},
                     {
-                        "$push": {"data.data": item}
+                        "$push": {"data": item}
                     }
                 )
     return Response('Collection Twits updated.')
