@@ -22,6 +22,7 @@ db = MONGODBPipeline()
 # Create stock database
 
 
+@app.route('dbsc')
 def createDBstock():
     if db.info_collection.count() == 0:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -88,6 +89,7 @@ def deleteDBstock():
 # Create Twits database
 
 
+@app.route('/dbtc')
 def createDBtwits():
     if db.twits_collection.count() == 0:
         with open('static/sp100.json', 'rb') as f:
@@ -101,7 +103,7 @@ def createDBtwits():
                 item = {}
                 for msg in msgs:
                     item = {}
-                    item['name'] = i['name']
+                    item['name'] = msg['user']['username']
                     item['body'] = msg['body']
                     item['id'] = msg['id']
                     item['time'] = msg['created_at']
