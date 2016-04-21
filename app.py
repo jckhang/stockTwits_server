@@ -9,7 +9,7 @@ from bson import json_util
 from pipelines import MONGODBPipeline
 from datetime import datetime
 from yahoo_finance import Share
-
+import unirest
 
 # Create Database Stock
 app = Flask(__name__)
@@ -85,6 +85,70 @@ def updateDBstock():
 def deleteDBstock():
     db.info_collection.delete_many({})
     return Response('Collection Info deleted.')
+# Create Twits database
+
+
+def createDBtwits():
+    if db.twits_collection.count() == 0:
+        with open('static/sp100.json', 'rb') as f:
+            ls = json.load(f)
+            for i in ls:
+                response = unirest.get("https://api.stocktwits.com/api/2/streams/symbol/{0}.json".format(
+                    i['name']))
+                data = response.body
+                msgs = data['messages']
+                items = []
+                item = {}
+                for msg in msgs:
+                    item = {}
+                    item['name'] = i['name']
+                    item['body'] = msg['body']
+                    item['id'] = msg['id']
+                    item['time'] = msg['created_at']
+                    items.append(item)
+                db.twits_collection.insert_one({
+                    "name": i['name'],
+                    "sector": i['sector'],
+                    "data": [items]
+                })
+createDBtwits()
+# Update Twits database
+
+
+@app.route('/dbtu')
+def updateDBtwits():
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open('static/sp100.json', 'rb') as f:
+        ls = json.load(f)
+        for i in ls:
+            symbol = Share(i['name'])
+            item = {}
+            item['name'] = i['name']
+            item['price'] = symbol.get_price()
+            item['time'] = timestamp
+            item['prev_close'] = symbol.get_prev_close()
+            item['open'] = symbol.get_open()
+            item['volume'] = symbol.get_volume()
+            item['pe'] = symbol.get_price_earnings_ratio()
+            item['eps'] = symbol.get_earnings_share()
+            item['price_sales'] = symbol.get_price_sales()
+            item['ebitda'] = symbol.get_ebitda()
+            item['hottness'] = "NA"
+            item['B/S'] = "NA"
+            db.info_collection.update(
+                {"name": i['name']},
+                {
+                    "$push": {"data": item}
+                }
+            )
+    return Response('Collection Twits updated.')
+# Delete the record in twits database
+
+
+@app.route("/dbtd")
+def deleteDBtwits():
+    db.twits_collection.delete_many({})
+    return Response('Collection Twits deleted.')
 # Route for homepage
 
 
@@ -119,6 +183,16 @@ def section():
 def search():
     name = request.args['symbol']
     data = [i for i in db.info_collection.find({'name': name})]
+    return Response(json.dumps({'data': data}, default=json_util.default),
+                    mimetype='application/json')
+# Route for searching specific symbol and return it's twits
+
+
+@app.route("/twits", methods=["GET"])
+@cross_origin()
+def twits():
+    name = request.args['symbol']
+    data = [i for i in db.twits_collection.find({'name': name})]
     return Response(json.dumps({'data': data}, default=json_util.default),
                     mimetype='application/json')
 # Error Handler
