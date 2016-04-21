@@ -136,17 +136,12 @@ def updateDBtwits():
                 item['body'] = msg['body']
                 item['id'] = msg['id']
                 item['time'] = msg['created_at']
-                a = db.twits_collection.find(
-                    {'name': i['name']},
-                    {'data': 1, '_id': 0}).sort([("data.id", -1)])
-                max_id = a[0]['data'][0]['id']
-                if msg['id'] > max_id:
-                    db.info_collection.update(
-                        {"name": i['name']},
-                        {
-                            "$push": {"data.data": item}
-                        }
-                    )
+                db.info_collection.update(
+                    {"name": i['name']},
+                    {
+                        "$push": {"data.data": item}
+                    }
+                )
     return Response('Collection Twits updated.')
 # Delete the record in twits database
 
