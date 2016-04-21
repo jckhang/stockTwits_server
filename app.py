@@ -122,30 +122,31 @@ createDBtwits()
 
 @app.route('/dbtu')
 def updateDBtwits():
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open('static/sp100.json', 'rb') as f:
         ls = json.load(f)
         for i in ls:
-            symbol = Share(i['name'])
+            response = unirest.get("https://api.stocktwits.com/api/2/streams/symbol/{0}.json".format(
+                i['name']))
+            data = response.body
+            msgs = data['messages']
             item = {}
-            item['name'] = i['name']
-            item['price'] = symbol.get_price()
-            item['time'] = timestamp
-            item['prev_close'] = symbol.get_prev_close()
-            item['open'] = symbol.get_open()
-            item['volume'] = symbol.get_volume()
-            item['pe'] = symbol.get_price_earnings_ratio()
-            item['eps'] = symbol.get_earnings_share()
-            item['price_sales'] = symbol.get_price_sales()
-            item['ebitda'] = symbol.get_ebitda()
-            item['hottness'] = "NA"
-            item['B/S'] = "NA"
-            db.info_collection.update(
-                {"name": i['name']},
-                {
-                    "$push": {"data": item}
-                }
-            )
+            for msg in msgs:
+                item = {}
+                item['name'] = msg['user']['username']
+                item['body'] = msg['body']
+                item['id'] = msg['id']
+                item['time'] = msg['created_at']
+                a = db.twits_collection.find(
+                    {'name': i['name']},
+                    {'data': 1, '_id': 0}).sort([("data.id", -1)])
+                max_id = a[0]['data'][0]['id']
+                if msg['id'] > max_id:
+                    db.info_collection.update(
+                        {"name": i['name']},
+                        {
+                            "$push": {"data.data": item}
+                        }
+                    )
     return Response('Collection Twits updated.')
 # Delete the record in twits database
 
