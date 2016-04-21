@@ -22,7 +22,7 @@ db = MONGODBPipeline()
 # Create stock database
 
 
-@app.route('dbsc')
+@app.route('/dbsc')
 def createDBstock():
     if db.info_collection.count() == 0:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
