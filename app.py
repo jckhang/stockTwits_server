@@ -29,62 +29,67 @@ def createDBstock():
             ls = json.load(f)
             for i in ls:
                 symbol = Share(i['name'])
-                i['price'] = symbol.get_price()
-                i['time'] = timestamp
-                i['prev_close'] = symbol.get_prev_close()
-                i['open'] = symbol.get_open()
-                i['volume'] = symbol.get_volume()
-                i['price_earnings_ratio'] = symbol.get_price_earnings_ratio()
-                i['price_sales'] = symbol.get_price_sales()
-                i['ebitda'] = symbol.get_ebitda()
-                i['hottness'] = "NA"
-                i['B/S'] = "NA"
-        print(db.info_collection.insert_many(ls))
+                item = {}
+                item['name'] = i['name']
+                item['price'] = symbol.get_price()
+                item['time'] = timestamp
+                item['prev_close'] = symbol.get_prev_close()
+                item['open'] = symbol.get_open()
+                item['volume'] = symbol.get_volume()
+                item[
+                    'price_earnings_ratio'] = symbol.get_price_earnings_ratio()
+                item['price_sales'] = symbol.get_price_sales()
+                item['ebitda'] = symbol.get_ebitda()
+                item['hottness'] = "NA"
+                item['B/S'] = "NA"
+                db.info_collection.insert_one({
+                    "name": i['name'],
+                    "sector": i['sector'],
+                    "data": [item]
+                })
 createDBstock()
 # Update Stock database
 
 
+@app.route('/dbsu')
 def updateDBstock():
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open('static/sp100.json', 'rb') as f:
         ls = json.load(f)
         for i in ls:
             symbol = Share(i['name'])
-            i['price'] = symbol.get_price()
-            i['time'] = timestamp
-            i['prev_close'] = symbol.get_prev_close()
-            i['open'] = symbol.get_open()
-            i['volume'] = symbol.get_volume()
-            i['price_earnings_ratio'] = symbol.get_price_earnings_ratio()
-            i['price_sales'] = symbol.get_price_sales()
-            i['ebitda'] = symbol.get_ebitda()
-            i['hottness'] = "NA"
-            i['B/S'] = "NA"
-    print(db.info_collection.insert_many(ls))
+            item = {}
+            item['price'] = symbol.get_price()
+            item['time'] = timestamp
+            item['prev_close'] = symbol.get_prev_close()
+            item['open'] = symbol.get_open()
+            item['volume'] = symbol.get_volume()
+            item[
+                'price_earnings_ratio'] = symbol.get_price_earnings_ratio()
+            item['price_sales'] = symbol.get_price_sales()
+            item['ebitda'] = symbol.get_ebitda()
+            item['hottness'] = "NA"
+            item['B/S'] = "NA"
+            db.info_collection.update(
+                {"name": i['name']},
+                {
+                    "$push": {"data": item}
+                }
+            )
+    return Response('Collection Info updated.')
 # Delete the record in stock database
 
 
 @app.route("/dbsd")
 def deleteDBstock():
     db.info_collection.delete_many({})
-    return Response(jsonify({'message': 'Collection Info deleted.'}))
+    return Response('Collection Info deleted.')
 # Route for homepage
 
 
 @app.route("/")
 def home():
     return render_template("home.html", name="home")
-
-# Route for searching specific symbol and it's general information
-
-
-@app.route("/search", methods=["GET"])
-@cross_origin()
-def search():
-    name = request.args['symbol']
-    data = [i for i in db.info_collection.find({'name': name})]
-    return Response(json.dumps({'data': data}, default=json_util.default),
-                    mimetype='application/json')
 # Route for getting symbol within sector
 
 
@@ -100,10 +105,20 @@ def section():
     else:
         sector = request.args['sector'][
             0].upper() + request.args['sector'][1:] + " Sector Symbols"
-        data = [i for i in db.info_collection.find(
+        data = [i.data[len(i.data)] for i in db.info_collection.find(
             {'sector': request.args['sector']})]
         return Response(json.dumps({sector: data}, default=json_util.default),
                         mimetype='application/json')
+# Route for searching specific symbol and it's general information
+
+
+@app.route("/search", methods=["GET"])
+@cross_origin()
+def search():
+    name = request.args['symbol']
+    data = [i for i in db.info_collection.find({'name': name})]
+    return Response(json.dumps({'data': data}, default=json_util.default),
+                    mimetype='application/json')
 # Error Handler
 
 

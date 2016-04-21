@@ -12,8 +12,8 @@ class MONGODBPipeline(object):
             print "connect heroku"
         else:
             connection = pymongo.MongoClient(
-                # settings.MONGODB_URI
-                "mongodb://user:123@ds061974.mlab.com:61974/heroku_6nk70pz9"
+                settings.MONGODB_URI
+                # "mongodb://user:123@ds061974.mlab.com:61974/heroku_6nk70pz9"
             )
             print "connect local"
         db = connection[settings.MONGODB_DB]
