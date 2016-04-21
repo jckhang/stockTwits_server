@@ -59,6 +59,7 @@ def updateDBstock():
         for i in ls:
             symbol = Share(i['name'])
             item = {}
+            item['name'] = i['name']
             item['price'] = symbol.get_price()
             item['time'] = timestamp
             item['prev_close'] = symbol.get_prev_close()
@@ -98,7 +99,8 @@ def home():
 def section():
     if not('sector' in request.args) or (request.args['sector'] == 'All'):
         sector = "S&P 100 Index Symbols"
-        data = [i for i in db.info_collection.find()]
+        data = [i['data'][len(i['data']) - 1]
+                for i in db.info_collection.find()]
         return Response(json.dumps({sector: data}, default=json_util.default),
                         mimetype='application/json')
 
