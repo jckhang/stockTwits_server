@@ -48,6 +48,7 @@ def createDBstock():
                     "sector": i['sector'],
                     "data": [item]
                 })
+    return Response('Collection Info created.')
 createDBstock()
 # Update Stock database
 
@@ -111,8 +112,10 @@ def createDBtwits():
                 db.twits_collection.insert_one({
                     "name": i['name'],
                     "sector": i['sector'],
-                    "data": [items]
+                    "data": items
                 })
+    return Response('Collection Twits Created.')
+
 createDBtwits()
 # Update Twits database
 
