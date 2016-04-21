@@ -36,8 +36,8 @@ def createDBstock():
                 item['prev_close'] = symbol.get_prev_close()
                 item['open'] = symbol.get_open()
                 item['volume'] = symbol.get_volume()
-                item[
-                    'price_earnings_ratio'] = symbol.get_price_earnings_ratio()
+                item['pe'] = symbol.get_price_earnings_ratio()
+                item['eps'] = symbol.get_earnings_share()
                 item['price_sales'] = symbol.get_price_sales()
                 item['ebitda'] = symbol.get_ebitda()
                 item['hottness'] = "NA"
@@ -65,8 +65,8 @@ def updateDBstock():
             item['prev_close'] = symbol.get_prev_close()
             item['open'] = symbol.get_open()
             item['volume'] = symbol.get_volume()
-            item[
-                'price_earnings_ratio'] = symbol.get_price_earnings_ratio()
+            item['pe'] = symbol.get_price_earnings_ratio()
+            item['eps'] = symbol.get_earnings_share()
             item['price_sales'] = symbol.get_price_sales()
             item['ebitda'] = symbol.get_ebitda()
             item['hottness'] = "NA"
