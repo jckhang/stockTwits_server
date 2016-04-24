@@ -119,7 +119,7 @@ def createDBtwits():
 
 createDBtwits()
 # Update Twits database
-
+#
 
 @app.route('/dbtu')
 def updateDBtwits():
