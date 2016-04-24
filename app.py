@@ -19,7 +19,8 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 db = MONGODBPipeline()
 
-# Create stock database
+# -------- Stock Symbol --------
+# Create stock symbol
 
 
 @app.route('/dbsc')
@@ -76,7 +77,7 @@ def updateDBstock():
             db.info_collection.update(
                 {"name": i['name']},
                 {
-                    "$push": {"data": item}
+                    "$setOnInsert": {"data": item}
                 }
             )
     return Response('Collection Info updated.')
@@ -87,6 +88,8 @@ def updateDBstock():
 def deleteDBstock():
     db.info_collection.delete_many({})
     return Response('Collection Info deleted.')
+
+# --------- StockTwits ----------
 # Create Twits database
 
 
@@ -95,25 +98,23 @@ def createDBtwits():
     if db.twits_collection.count() == 0:
         with open('static/sp100.json', 'rb') as f:
             ls = json.load(f)
+            url = "https://api.stocktwits.com/api/2/streams/symbol/{}.json"
             for i in ls:
-                response = unirest.get("https://api.stocktwits.com/api/2/streams/symbol/{0}.json".format(
+                response = unirest.get(url.format(
                     i['name']))
                 data = response.body
                 msgs = data['messages']
                 items = []
-                item = {}
                 for msg in msgs:
                     item = {}
                     item['name'] = msg['user']['username']
                     item['body'] = msg['body']
                     item['id'] = msg['id']
-                    item['time'] = msg['created_at']
+                    item['time'] = datetime.strptime(
+                        msg['created_at'], "%Y-%m-%dT%H:%M:%SZ")
+                    item['symbols'] = [i['symbol'] for i in msg['symbols']]
+                    item['reshares'] = msg['reshares']['reshared_count']
                     items.append(item)
-                db.twits_collection.insert_one({
-                    "name": i['name'],
-                    "sector": i['sector'],
-                    "data": items
-                })
     return Response('Collection Twits Created.')
 
 createDBtwits()
@@ -124,24 +125,24 @@ createDBtwits()
 def updateDBtwits():
     with open('static/sp100.json', 'rb') as f:
         ls = json.load(f)
+        url = "https://api.stocktwits.com/api/2/streams/symbol/{0}.json"
         for i in ls:
-            response = unirest.get("https://api.stocktwits.com/api/2/streams/symbol/{0}.json".format(
+            response = unirest.get(url.format(
                 i['name']))
             data = response.body
             msgs = data['messages']
-            item = {}
+            items = []
             for msg in msgs:
                 item = {}
                 item['name'] = msg['user']['username']
                 item['body'] = msg['body']
                 item['id'] = msg['id']
-                item['time'] = msg['created_at']
-                db.twits_collection.update(
-                    {"name": i['name']},
-                    {
-                        "$push": {"data": item}
-                    }
-                )
+                item['time'] = datetime.strptime(
+                    msg['created_at'], "%Y-%m-%dT%H:%M:%SZ")
+                item['symbols'] = [i['symbol'] for i in msg['symbols']]
+                item['reshares'] = msg['reshares']['reshared_count']
+                items.append(item)
+            db.twits_collection.insert_many(items)
     return Response('Collection Twits updated.')
 # Delete the record in twits database
 
@@ -193,7 +194,9 @@ def search():
 @cross_origin()
 def twits():
     name = request.args['symbol']
-    data = [i for i in db.twits_collection.find({'name': name})]
+    data = [i for i in db.twits_collection.find({"symbols":
+                                                 {"$elemMatch":
+                                                  {"$eq": name}}})]
     return Response(json.dumps({'data': data}, default=json_util.default),
                     mimetype='application/json')
 # Error Handler
