@@ -9,6 +9,7 @@ from bson import json_util
 from pipelines import MONGODBPipeline
 from datetime import datetime
 from yahoo_finance import Share
+from settings import ACCESS_TOKEN
 import unirest
 
 # Create Database Stock
@@ -98,10 +99,11 @@ def createDBtwits():
     if db.twits_collection.count() == 0:
         with open('static/sp100.json', 'rb') as f:
             ls = json.load(f)
-            url = "https://api.stocktwits.com/api/2/streams/symbol/{}.json"
+            unirest.timeout(5)
+            url = "https://api.stocktwits.com/api/2/streams/symbol/{}.json?access_token={}"
             for i in ls:
                 response = unirest.get(url.format(
-                    i['name']))
+                    i['name'], ACCESS_TOKEN))
                 data = response.body
                 msgs = data['messages']
                 items = []
@@ -122,14 +124,16 @@ createDBtwits()
 # Update Twits database
 #
 
+
 @app.route('/dbtu')
 def updateDBtwits():
     with open('static/sp100.json', 'rb') as f:
         ls = json.load(f)
-        url = "https://api.stocktwits.com/api/2/streams/symbol/{0}.json"
+        url = "https://api.stocktwits.com/api/2/streams/symbol/{0}.json?access_token={}"
         for i in ls:
+            unirest.timeout(5)
             response = unirest.get(url.format(
-                i['name']))
+                i['name'], ACCESS_TOKEN))
             data = response.body
             msgs = data['messages']
             items = []
