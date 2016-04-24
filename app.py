@@ -199,12 +199,18 @@ def search():
 @app.route("/twits", methods=["GET"])
 @cross_origin()
 def twits():
-    name = request.args['symbol']
-    data = [i for i in db.twits_collection.find({"symbols":
-                                                 {"$elemMatch":
-                                                  {"$eq": name}}})]
-    return Response(json.dumps({'data': data}, default=json_util.default),
-                    mimetype='application/json')
+    if not('symbol' in request.args) or (request.args['symbol'] == 'All'):
+        data = [
+            i for i in db.twits_collection.find().sort('time', -1).limit(30)]
+        return Response(json.dumps({'data': data}, default=json_util.default),
+                        mimetype='application/json')
+    else:
+        name = request.args['symbol']
+        data = [i for i in db.twits_collection.find({"symbols":
+                                                     {"$elemMatch":
+                                                      {"$eq": name}}}).sort('time', -1).limit(30)]
+        return Response(json.dumps({'data': data}, default=json_util.default),
+                        mimetype='application/json')
 # Error Handler
 
 
