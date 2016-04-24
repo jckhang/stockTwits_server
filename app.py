@@ -112,8 +112,7 @@ def createDBtwits():
                     item['name'] = msg['user']['username']
                     item['body'] = msg['body']
                     item['id'] = msg['id']
-                    item['time'] = datetime.strptime(
-                        msg['created_at'], "%Y-%m-%dT%H:%M:%SZ")
+                    item['time'] = msg['created_at']
                     item['symbols'] = [i['symbol'] for i in msg['symbols']]
                     item['reshares'] = msg['reshares']['reshared_count']
                     items.append(item)
@@ -142,8 +141,7 @@ def updateDBtwits():
                 item['name'] = msg['user']['username']
                 item['body'] = msg['body']
                 item['id'] = msg['id']
-                item['time'] = datetime.strptime(
-                    msg['created_at'], "%Y-%m-%dT%H:%M:%SZ")
+                item['time'] = msg['created_at']
                 item['symbols'] = [i['symbol'] for i in msg['symbols']]
                 item['reshares'] = msg['reshares']['reshared_count']
                 items.append(item)
@@ -200,15 +198,15 @@ def search():
 @cross_origin()
 def twits():
     if not('symbol' in request.args) or (request.args['symbol'] == 'All'):
-        data = [
-            i for i in db.twits_collection.find().sort('time', -1).limit(30)]
+        data = [i for i in db.twits_collection.find(
+            {}, projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(30)]
         return Response(json.dumps({'data': data}, default=json_util.default),
                         mimetype='application/json')
     else:
         name = request.args['symbol']
-        data = [i for i in db.twits_collection.find({"symbols":
-                                                     {"$elemMatch":
-                                                      {"$eq": name}}}).sort('time', -1).limit(30)]
+        data = [i for i in db.twits_collection.find(
+            {"symbols": {"$elemMatch": {"$eq": name}}},
+            projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(30)]
         return Response(json.dumps({'data': data}, default=json_util.default),
                         mimetype='application/json')
 # Error Handler
