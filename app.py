@@ -99,7 +99,7 @@ def createDBtwits():
     if db.twits_collection.count() == 0:
         with open('static/sp100.json', 'rb') as f:
             ls = json.load(f)
-            unirest.timeout(5)
+            unirest.timeout(20)
             url = "https://api.stocktwits.com/api/2/streams/symbol/{}.json?access_token={}"
             for i in ls:
                 response = unirest.get(url.format(
@@ -129,9 +129,9 @@ createDBtwits()
 def updateDBtwits():
     with open('static/sp100.json', 'rb') as f:
         ls = json.load(f)
-        url = "https://api.stocktwits.com/api/2/streams/symbol/{0}.json?access_token={}"
+        url = "https://api.stocktwits.com/api/2/streams/symbol/{}.json?access_token={}"
         for i in ls:
-            unirest.timeout(5)
+            unirest.timeout(20)
             response = unirest.get(url.format(
                 i['name'], ACCESS_TOKEN))
             data = response.body
