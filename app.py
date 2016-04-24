@@ -148,6 +148,7 @@ def updateDBtwits():
                 item['reshares'] = msg['reshares']['reshared_count']
                 items.append(item)
             db.twits_collection.insert_many(items)
+    db.twits_collection.ensure_index("id", unique=True)
     return Response('Collection Twits updated.')
 # Delete the record in twits database
 
