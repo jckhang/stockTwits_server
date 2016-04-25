@@ -79,7 +79,7 @@ def updateDBstock():
             db.info_collection.update(
                 {"name": i['name']},
                 {
-                    "$setOnInsert": {"data": item}
+                    "$push": {"data": item}
                 }
             )
     return Response('Collection Info updated.')
