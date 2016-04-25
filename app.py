@@ -116,6 +116,7 @@ def createDBtwits():
                     item['symbols'] = [i['symbol'] for i in msg['symbols']]
                     item['reshares'] = msg['reshares']['reshared_count']
                     items.append(item)
+                db.twits_collection.ensure_index("id", unique=True)
                 db.twits_collection.insert_many(items)
     return Response('Collection Twits Created.')
 
