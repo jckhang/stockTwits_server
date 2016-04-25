@@ -51,6 +51,7 @@ def createDBstock():
                     "sector": i['sector'],
                     "data": [item]
                 })
+    print('DBstock created')
     return Response('Collection Info created.')
 createDBstock()
 # Update Stock database
@@ -82,6 +83,7 @@ def updateDBstock():
                     "$push": {"data": item}
                 }
             )
+    print('DBstock updated')
     return Response('Collection Info updated.')
 # Delete the record in stock database
 
