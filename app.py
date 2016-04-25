@@ -115,6 +115,7 @@ def createDBtwits():
                     item['time'] = msg['created_at']
                     item['symbols'] = [i['symbol'] for i in msg['symbols']]
                     item['reshares'] = msg['reshares']['reshared_count']
+                    item['b/s'] = msg['entities']['sentiment']
                     items.append(item)
                 db.twits_collection.ensure_index("id", unique=True)
                 db.twits_collection.insert_many(items)
@@ -145,6 +146,7 @@ def updateDBtwits():
                 item['time'] = msg['created_at']
                 item['symbols'] = [i['symbol'] for i in msg['symbols']]
                 item['reshares'] = msg['reshares']['reshared_count']
+                item['b/s'] = msg['entities']['sentiment']
                 items.append(item)
             db.twits_collection.ensure_index("id", unique=True)
             db.twits_collection.insert_many(items)
