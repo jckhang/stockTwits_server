@@ -223,6 +223,13 @@ def twits():
             projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(30)]
         return Response(json.dumps({'data': data}, default=json_util.default),
                         mimetype='application/json')
+# Route for getting price for specific symbol.
+
+
+@app.route('/price', methods=["GET"])
+@cross_origin()
+def price():
+    pass
 # Error Handler
 
 
