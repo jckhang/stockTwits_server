@@ -11,6 +11,7 @@ from datetime import datetime
 from yahoo_finance import Share
 from settings import ACCESS_TOKEN
 import unirest
+import pytz
 
 # Create Database Stock
 app = Flask(__name__)
@@ -112,7 +113,11 @@ def createDBtwits():
                     item['name'] = msg['user']['username']
                     item['body'] = msg['body']
                     item['id'] = msg['id']
-                    item['time'] = msg['created_at']
+                    time = datetime.strptime(
+                        msg['created_at'], "%Y-%m-%dT%H:%M:%SZ")
+                    utc = pytz.utc
+                    item['time'] = utc.localize(time).astimezone(
+                        pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S')
                     item['symbols'] = [i['symbol'] for i in msg['symbols']]
                     item['reshares'] = msg['reshares']['reshared_count']
                     item['b/s'] = msg['entities']['sentiment']
@@ -143,7 +148,11 @@ def updateDBtwits():
                 item['name'] = msg['user']['username']
                 item['body'] = msg['body']
                 item['id'] = msg['id']
-                item['time'] = msg['created_at']
+                time = datetime.strptime(
+                    msg['created_at'], "%Y-%m-%dT%H:%M:%SZ")
+                utc = pytz.utc
+                item['time'] = utc.localize(time).astimezone(
+                    pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S')
                 item['symbols'] = [i['symbol'] for i in msg['symbols']]
                 item['reshares'] = msg['reshares']['reshared_count']
                 item['b/s'] = msg['entities']['sentiment']

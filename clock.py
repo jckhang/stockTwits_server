@@ -7,7 +7,7 @@ sched = BlockingScheduler()
 def timed_job():
     updateDBstock()
     updateDBtwits()
-    print('This job is run every one minutes.')
+    print('This job is run every 10 minutes.')
 
 
 # @sched.scheduled_job('cron', day_of_week='mon-fri', hour=17)
