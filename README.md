@@ -23,7 +23,7 @@ and open http://127.0.0.1:5000/ in the browser.
 Run in terminal
 ```
     heroku login
-    heroku git:remote -a stockbackend
+    heroku git:remote -a stocktwitsbackend
 ```
 
 After you edition of the codes,
