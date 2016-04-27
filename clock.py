@@ -17,7 +17,8 @@ def timed_job2():
 
 @sched.scheduled_job('cron', day_of_week='mon-fri', hour='9.5-16')
 def scheduled_job():
-    updateDBstock()
+    timed_job1()
+    timed_job2()
     print('This job is run every weekday at 9:30 to 16.')
 
 sched.start()
