@@ -13,12 +13,13 @@ sched = BlockingScheduler()
 # def timed_job2():
 #     updateDBtwits()
 #     print('stock twits is updated every 30 minutes.')
-
-
-@sched.scheduled_job('cron', day_of_week='mon-fri', hour='9.5-16')
 def scheduled_job():
     updateDBstock()
     updateDBtwits()
     print('This job is run every weekday at 9:30 to 16.')
+
+
+sched.add_job(scheduled_job, 'cron', day_of_week='mon-fri', hour='9.5-16')
+
 
 sched.start()
