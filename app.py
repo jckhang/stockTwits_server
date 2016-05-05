@@ -169,6 +169,9 @@ def updateDBtwits():
 def deleteDBtwits():
     db.twits_collection.delete_many({})
     return Response('Collection Twits deleted.')
+
+# ===============API GET===============
+
 # Route for homepage
 
 
@@ -202,7 +205,8 @@ def section():
 @cross_origin()
 def search():
     name = request.args['symbol']
-    data = [i for i in db.info_collection.find({'name': name})]
+    data = [i for i in db.info_collection.find(
+        {'name': name})]
     return Response(json.dumps({'data': data}, default=json_util.default),
                     mimetype='application/json')
 # Route for searching specific symbol and return it's twits
