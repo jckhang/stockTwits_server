@@ -1,13 +1,12 @@
 from flask import Flask, render_template, request, json, Response
 from flask.ext.cors import CORS, cross_origin
 from bson import json_util
-from pipelines import MONGODBPipeline
 from datetime import datetime
 from yahoo_finance import Share
-from settings import ACCESS_TOKEN
 import unirest
 import pytz
-from misc.stock_processing import hottness_function, bs_function
+from settings import ACCESS_TOKEN, MONGODBPipeline
+import misc.stock_processing as ms
 # App config
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -29,19 +28,19 @@ def createInfos():
             ls = json.load(f)
             for i in ls:
                 symbol = Share(i['name'])
-                item = {}
-                item['name'] = i['name']
-                item['price'] = symbol.get_price()
-                item['time'] = timestamp
-                item['prev_close'] = symbol.get_prev_close()
-                item['open'] = symbol.get_open()
-                item['volume'] = symbol.get_volume()
-                item['pe'] = symbol.get_price_earnings_ratio()
-                item['eps'] = symbol.get_earnings_share()
-                item['price_sales'] = symbol.get_price_sales()
-                item['ebitda'] = symbol.get_ebitda()
-                item['hottness'] = "NA"
-                item['B/S'] = "NA"
+                item = {
+                    'name': i['name'],
+                    'price': symbol.get_price(),
+                    'time': timestamp,
+                    'prev_close': symbol.get_prev_close(),
+                    'open': symbol.get_open(),
+                    'volume': symbol.get_volume(),
+                    'pe': symbol.get_price_earnings_ratio(),
+                    'eps': symbol.get_earnings_share(),
+                    'price_sales': symbol.get_price_sales(),
+                    'ebitda': symbol.get_ebitda()
+                    'hottness': "NA",
+                    'B/S': "NA"}
                 db.infos.insert_one({
                     "name": i['name'],
                     "sector": i['sector'],
@@ -60,19 +59,19 @@ def updateInfos():
         ls = json.load(f)
         for i in ls:
             symbol = Share(i['name'])
-            item = {}
-            item['name'] = i['name']
-            item['price'] = symbol.get_price()
-            item['time'] = timestamp
-            item['prev_close'] = symbol.get_prev_close()
-            item['open'] = symbol.get_open()
-            item['volume'] = symbol.get_volume()
-            item['pe'] = symbol.get_price_earnings_ratio()
-            item['eps'] = symbol.get_earnings_share()
-            item['price_sales'] = symbol.get_price_sales()
-            item['ebitda'] = symbol.get_ebitda()
-            item['hottness'] = "NA"
-            item['B/S'] = "NA"
+            item = {
+                'name': i['name'],
+                'price': symbol.get_price(),
+                'time': timestamp,
+                'prev_close': symbol.get_prev_close(),
+                'open': symbol.get_open(),
+                'volume': symbol.get_volume(),
+                'pe': symbol.get_price_earnings_ratio(),
+                'eps': symbol.get_earnings_share(),
+                'price_sales': symbol.get_price_sales(),
+                'ebitda': symbol.get_ebitda()
+                'hottness': "NA",
+                'B/S': "NA"}
             db.infos.update(
                 {"name": i['name']},
                 {
@@ -108,18 +107,17 @@ def createTwits():
                 msgs = data['messages']
                 items = []
                 for msg in msgs:
-                    item = {}
-                    item['name'] = msg['user']['username']
-                    item['body'] = msg['body']
-                    item['id'] = msg['id']
                     time = datetime.strptime(
                         msg['created_at'], "%Y-%m-%dT%H:%M:%SZ")
                     utc = pytz.utc
-                    item['time'] = utc.localize(time).astimezone(
-                        pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S')
-                    item['symbols'] = [i['symbol'] for i in msg['symbols']]
-                    item['reshares'] = msg['reshares']['reshared_count']
-                    item['b/s'] = msg['entities']['sentiment']
+                    item = {
+                        'name': msg['user']['username'],
+                        'body': msg['body'],
+                        'id': msg['id']
+                        'time': utc.localize(time).astimezone(pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S'),
+                        'symbols': [i['symbol'] for i in msg['symbols']],
+                        'reshares': msg['reshares']['reshared_count'],
+                        'b/s': msg['entities']['sentiment']}
                     items.append(item)
                 db.twits.ensure_index("id", unique=True)
                 db.twits.insert_many(items)
@@ -142,19 +140,17 @@ def updateTwits():
             msgs = data['messages']
             items = []
             for msg in msgs:
-                item = {}
-                item['name'] = msg['user']['username']
-                item['body'] = msg['body']
-                item['id'] = msg['id']
                 time = datetime.strptime(
                     msg['created_at'], "%Y-%m-%dT%H:%M:%SZ")
                 utc = pytz.utc
-                item['time'] = utc.localize(time).astimezone(
-                    pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S')
-                item['symbols'] = [i['symbol'] for i in msg['symbols']]
-                item['reshares'] = msg['reshares']['reshared_count']
-                item['b/s'] = msg['entities']['sentiment']
-                items.append(item)
+                item = {
+                    'name': msg['user']['username'],
+                    'body': msg['body'],
+                    'id': msg['id']
+                    'time': utc.localize(time).astimezone(pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S'),
+                    'symbols': [i['symbol'] for i in msg['symbols']],
+                    'reshares': msg['reshares']['reshared_count'],
+                    'b/s': msg['entities']['sentiment']}
             db.twits.ensure_index("id", unique=True)
             db.twits.insert_many(items)
     return Response('Collection Twits updated.')
