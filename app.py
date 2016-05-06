@@ -120,8 +120,8 @@ def createTwits():
                     items.append(item)
                 db.twits.ensure_index("id", unique=True)
                 db.twits.insert_many(items)
-    print('Collection Twits Created.')
-    return Response('Collection Twits Created.')
+        print('Collection Twits Created.')
+        return Response('Collection Twits Created.')
 
 createTwits()
 # API CTU(Collection Twits Update)
