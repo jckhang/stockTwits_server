@@ -120,7 +120,8 @@ def createTwits():
                     items.append(item)
                 db.twits.ensure_index("id", unique=True)
                 db.twits.insert_many(items)
-            return Response('Collection Twits Created.')
+    print('Collection Twits Created.')
+    return Response('Collection Twits Created.')
 
 createTwits()
 # API CTU(Collection Twits Update)
@@ -153,13 +154,15 @@ def updateTwits():
                 items.append(item)
             db.twits.ensure_index("id", unique=True)
             db.twits.insert_many(items)
-    return Response('Collection Twits updated.')
+    print('Collection Twits Update.')
+    return Response('Collection Twits Updated.')
 # API CTD(Collection Twits Delete)
-
+# Only for Debug Use
 
 @app.route("/ctd")
 def deleteTwits():
     db.twits.delete_many({})
+    print('Collection Twits Deleted.')
     return Response('Collection Twits Deleted.')
 
 # ===============Route for API GET===============
