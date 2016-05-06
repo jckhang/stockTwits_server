@@ -159,6 +159,7 @@ def updateTwits():
 # API CTD(Collection Twits Delete)
 # Only for Debug Use
 
+
 @app.route("/ctd")
 def deleteTwits():
     db.twits.delete_many({})
