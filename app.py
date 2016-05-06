@@ -4,7 +4,7 @@ from datetime import datetime
 from yahoo_finance import Share
 import unirest
 import pytz
-from settings import ACCESS_TOKEN, MONGODBPipeline
+from misc.settings import ACCESS_TOKEN, MONGODBPipeline
 import misc.stock_processing as ms
 # App config
 app = Flask(__name__)

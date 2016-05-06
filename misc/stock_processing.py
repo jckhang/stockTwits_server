@@ -1,3 +1,6 @@
+from settings import ACCESS_TOKEN, MONGODBPipeline
+
+print ACCESS_TOKEN
 # Calculate the hottness of #symbol. The basic approach is to sum up the total
 # number of twits that contain that symbol.
 
