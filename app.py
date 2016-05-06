@@ -1,6 +1,5 @@
-from flask import Flask, render_template, request, json, Response
+from flask import Flask, render_template, request, json, jsonify, Response
 from flask.ext.cors import CORS, cross_origin
-from bson import json_util
 from datetime import datetime
 from yahoo_finance import Share
 import unirest
@@ -23,7 +22,6 @@ db = MONGODBPipeline()
 @app.route('/cic')
 def createInfos():
     if db.infos.count() == 0:
-
         with open('static/sp100.json', 'rb') as f:
             ls = json.load(f)
             for i in ls:
@@ -181,6 +179,7 @@ def section():
         sector = "S&P 100 Index Symbols"
         data = [i['data'][len(i['data']) - 1]
                 for i in db.infos.find()]
+        print data
         return Response(json.dumps({sector: data}, default=json_util.default),
                         mimetype='application/json')
 
@@ -189,8 +188,8 @@ def section():
             0].upper() + request.args['sector'][1:] + " Sector Symbols"
         data = [i['data'][len(i['data']) - 1]
                 for i in db.infos.find({'sector': request.args['sector']})]
-        return Response(json.dumps({sector: data}, default=json_util.default),
-                        mimetype='application/json')
+        print data
+        return jsonify({sector: data})
 # Route for searching specific symbol and it's general information
 
 
@@ -198,10 +197,9 @@ def section():
 @cross_origin()
 def search():
     name = request.args['symbol']
-    data = [i for i in db.infos.find(
-        {'name': name})]
-    return Response(json.dumps({'data': data}, default=json_util.default),
-                    mimetype='application/json')
+    data = [i['data'][-10:] for i in db.infos.find({'name': name})]
+    # print data
+    return jsonify({'data': data})
 # Route for searching specific symbol and return it's twits
 
 
@@ -211,15 +209,13 @@ def twits():
     if not('symbol' in request.args) or (request.args['symbol'] == 'All'):
         data = [i for i in db.twits.find(
             {}, projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(30)]
-        return Response(json.dumps({'data': data}, default=json_util.default),
-                        mimetype='application/json')
+        return jsonify({'data': data})
     else:
         name = request.args['symbol']
         data = [i for i in db.twits.find(
             {"symbols": {"$elemMatch": {"$eq": name}}},
             projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(30)]
-    return Response(json.dumps({'data': data}, default=json_util.default),
-                    mimetype='application/json')
+    return jsonify({'data': data})
 # Route for getting price for specific symbol.
 
 
@@ -236,7 +232,7 @@ def not_found(error=None):
         'status': 404,
         'message': 'Not Found: ' + request.url,
     }
-    return Response(json.dumps(message, default=json_util.default), mimetype="application/json")
+    return jsonify(message)
 
 if __name__ == "__main__":
     app.run(debug=True)

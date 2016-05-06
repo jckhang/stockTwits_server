@@ -1,5 +1,5 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
-from app import updateDBstock, updateDBtwits
+from app import updateTwits, updateInfos
 sched = BlockingScheduler()
 
 
