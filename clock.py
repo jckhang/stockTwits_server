@@ -14,8 +14,8 @@ sched = BlockingScheduler()
 #     updateDBtwits()
 #     print('stock twits is updated every 30 minutes.')
 def scheduled_job():
-    updateDBstock()
-    updateDBtwits()
+    updateInfos()
+    updateTwits()
     print('This job is run every weekday at 9 to 16.')
 
 
