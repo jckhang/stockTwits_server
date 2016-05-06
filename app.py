@@ -179,7 +179,6 @@ def section():
         sector = "S&P 100 Index Symbols"
         data = [i['data'][len(i['data']) - 1]
                 for i in db.infos.find()]
-        print data
         return Response(json.dumps({sector: data}, default=json_util.default),
                         mimetype='application/json')
 
@@ -188,7 +187,6 @@ def section():
             0].upper() + request.args['sector'][1:] + " Sector Symbols"
         data = [i['data'][len(i['data']) - 1]
                 for i in db.infos.find({'sector': request.args['sector']})]
-        print data
         return jsonify({sector: data})
 # Route for searching specific symbol and it's general information
 
@@ -198,7 +196,6 @@ def section():
 def search():
     name = request.args['symbol']
     data = [i['data'][-10:] for i in db.infos.find({'name': name})]
-    # print data
     return jsonify({'data': data})
 # Route for searching specific symbol and return it's twits
 
