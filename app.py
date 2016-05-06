@@ -69,10 +69,10 @@ def updateInfos():
                 'eps': symbol.get_earnings_share(),
                 'price_sales': symbol.get_price_sales(),
                 'ebitda': symbol.get_ebitda(),
-                'hottness': "NA",
-                'B/S': "NA"}
+                'hottness': ms.hottness_function(i['name']),
+                'B/S': ms.bs_function(i['name'])}
             db.infos.update(
-                {"name": i['name']},
+                {"data.name": i['name']},
                 {
                     "$push": {"data": item}
                 }
