@@ -150,6 +150,7 @@ def updateTwits():
                     'symbols': [i['symbol'] for i in msg['symbols']],
                     'reshares': msg['reshares']['reshared_count'],
                     'b/s': msg['entities']['sentiment']}
+                items.append(item)
             db.twits.ensure_index("id", unique=True)
             db.twits.insert_many(items)
     return Response('Collection Twits updated.')
