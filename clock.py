@@ -20,6 +20,6 @@ def scheduled_job():
 
 
 # sched.add_job(scheduled_job, 'cron', day_of_week='mon-fri', hour='9-16')
-sched.add_job(scheduled_job, 'cron')
+sched.add_job(scheduled_job, 'interval', minutes=10)
 
 sched.start()
