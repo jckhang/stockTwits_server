@@ -1,9 +1,4 @@
-from flask import Flask
-from flask import render_template
-from flask import request
-from flask import json
-from flask import jsonify
-from flask import Response
+from flask import Flask, render_template, request, json, Response
 from flask.ext.cors import CORS, cross_origin
 from bson import json_util
 from pipelines import MONGODBPipeline
@@ -12,22 +7,23 @@ from yahoo_finance import Share
 from settings import ACCESS_TOKEN
 import unirest
 import pytz
-
-# Create Database Stock
+from misc.stock_processing import hottness_function, bs_function
+# App config
 app = Flask(__name__)
 app.config.from_object(__name__)
+# Cors Config
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
-
+# Create Database Stock
 db = MONGODBPipeline()
 
-# -------- Stock Symbol --------
-# Create stock symbol
+# -------- Stock Infos --------
+# API CIC(Collection Infos Create)
 
 
-@app.route('/dbsc')
-def createDBstock():
-    if db.info_collection.count() == 0:
+@app.route('/cic')
+def createInfos():
+    if db.infos.count() == 0:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with open('static/sp100.json', 'rb') as f:
             ls = json.load(f)
@@ -46,19 +42,19 @@ def createDBstock():
                 item['ebitda'] = symbol.get_ebitda()
                 item['hottness'] = "NA"
                 item['B/S'] = "NA"
-                db.info_collection.insert_one({
+                db.infos.insert_one({
                     "name": i['name'],
                     "sector": i['sector'],
                     "data": [item]
                 })
-    print('DBstock created')
-    return Response('Collection Info created.')
-createDBstock()
-# Update Stock database
+        print('Collection Infos Created.')
+        return Response('Collection Infos Created.')
+createInfos()
+# API CIU(Collection Iinfo Update)
 
 
-@app.route('/dbsu')
-def updateDBstock():
+@app.route('/ciu')
+def updateInfos():
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open('static/sp100.json', 'rb') as f:
         ls = json.load(f)
@@ -77,29 +73,30 @@ def updateDBstock():
             item['ebitda'] = symbol.get_ebitda()
             item['hottness'] = "NA"
             item['B/S'] = "NA"
-            db.info_collection.update(
+            db.infos.update(
                 {"name": i['name']},
                 {
                     "$push": {"data": item}
                 }
             )
-    print('DBstock updated')
-    return Response('Collection Info updated.')
-# Delete the record in stock database
+    print('Collection Infos updated.')
+    return Response('Collection Infos updated.')
+# API CID(Collection Infos Delete)
+# Only for Debug Use
 
 
-@app.route("/dbsd")
-def deleteDBstock():
-    db.info_collection.delete_many({})
-    return Response('Collection Info deleted.')
+@app.route("/cid")
+def deleteInfos():
+    db.infos.delete_many({})
+    return Response('Collection Infos deleted.')
 
-# --------- StockTwits ----------
-# Create Twits database
+# --------- Stock Twits ----------
+# API CTC(Collection Twits Create)
 
 
-@app.route('/dbtc')
-def createDBtwits():
-    if db.twits_collection.count() == 0:
+@app.route('/ctc')
+def createTwits():
+    if db.twits.count() == 0:
         with open('static/sp100.json', 'rb') as f:
             ls = json.load(f)
             unirest.timeout(20)
@@ -124,17 +121,16 @@ def createDBtwits():
                     item['reshares'] = msg['reshares']['reshared_count']
                     item['b/s'] = msg['entities']['sentiment']
                     items.append(item)
-                db.twits_collection.ensure_index("id", unique=True)
-                db.twits_collection.insert_many(items)
-    return Response('Collection Twits Created.')
+                db.twits.ensure_index("id", unique=True)
+                db.twits.insert_many(items)
+            return Response('Collection Twits Created.')
 
-createDBtwits()
-# Update Twits database
-#
+createTwits()
+# API CTU(Collection Twits Update)
 
 
-@app.route('/dbtu')
-def updateDBtwits():
+@app.route('/ctu')
+def updateTwits():
     with open('static/sp100.json', 'rb') as f:
         ls = json.load(f)
         url = "https://api.stocktwits.com/api/2/streams/symbol/{}.json?access_token={}"
@@ -159,16 +155,16 @@ def updateDBtwits():
                 item['reshares'] = msg['reshares']['reshared_count']
                 item['b/s'] = msg['entities']['sentiment']
                 items.append(item)
-            db.twits_collection.ensure_index("id", unique=True)
-            db.twits_collection.insert_many(items)
+            db.twits.ensure_index("id", unique=True)
+            db.twits.insert_many(items)
     return Response('Collection Twits updated.')
-# Delete the record in twits database
+# API CTD(Collection Twits Delete)
 
 
-@app.route("/dbtd")
-def deleteDBtwits():
-    db.twits_collection.delete_many({})
-    return Response('Collection Twits deleted.')
+@app.route("/ctd")
+def deleteTwits():
+    db.twits.delete_many({})
+    return Response('Collection Twits Deleted.')
 
 # ===============API GET===============
 
@@ -187,7 +183,7 @@ def section():
     if not('sector' in request.args) or (request.args['sector'] == 'All'):
         sector = "S&P 100 Index Symbols"
         data = [i['data'][len(i['data']) - 1]
-                for i in db.info_collection.find()]
+                for i in db.infos.find()]
         return Response(json.dumps({sector: data}, default=json_util.default),
                         mimetype='application/json')
 
@@ -205,7 +201,7 @@ def section():
 @cross_origin()
 def search():
     name = request.args['symbol']
-    data = [i for i in db.info_collection.find(
+    data = [i for i in db.infos.find(
         {'name': name})]
     return Response(json.dumps({'data': data}, default=json_util.default),
                     mimetype='application/json')
@@ -216,17 +212,17 @@ def search():
 @cross_origin()
 def twits():
     if not('symbol' in request.args) or (request.args['symbol'] == 'All'):
-        data = [i for i in db.twits_collection.find(
+        data = [i for i in db.twits.find(
             {}, projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(30)]
         return Response(json.dumps({'data': data}, default=json_util.default),
                         mimetype='application/json')
     else:
         name = request.args['symbol']
-        data = [i for i in db.twits_collection.find(
+        data = [i for i in db.twits.find(
             {"symbols": {"$elemMatch": {"$eq": name}}},
             projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(30)]
-        return Response(json.dumps({'data': data}, default=json_util.default),
-                        mimetype='application/json')
+    return Response(json.dumps({'data': data}, default=json_util.default),
+                    mimetype='application/json')
 # Route for getting price for specific symbol.
 
 
@@ -243,9 +239,7 @@ def not_found(error=None):
         'status': 404,
         'message': 'Not Found: ' + request.url,
     }
-    resp = jsonify(message)
-    resp.status_code = 404
-    return resp
+    return Response(json.dumps(message, default=json_util.default), mimetype="application/json")
 
 if __name__ == "__main__":
     app.run(debug=True)
