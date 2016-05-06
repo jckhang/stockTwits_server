@@ -179,8 +179,7 @@ def section():
         sector = "S&P 100 Index Symbols"
         data = [i['data'][len(i['data']) - 1]
                 for i in db.infos.find()]
-        return Response(json.dumps({sector: data}, default=json_util.default),
-                        mimetype='application/json')
+        return jsonify({sector: data})
 
     else:
         sector = request.args['sector'][
