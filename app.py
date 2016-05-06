@@ -16,17 +16,18 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 # Create Database Stock
 db = MONGODBPipeline()
 
-# -------- Stock Infos --------
+# -------- Route to Manipulate Collection Infos --------
 # API CIC(Collection Infos Create)
 
 
 @app.route('/cic')
 def createInfos():
     if db.infos.count() == 0:
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
         with open('static/sp100.json', 'rb') as f:
             ls = json.load(f)
             for i in ls:
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 symbol = Share(i['name'])
                 item = {
                     'name': i['name'],
@@ -38,9 +39,9 @@ def createInfos():
                     'pe': symbol.get_price_earnings_ratio(),
                     'eps': symbol.get_earnings_share(),
                     'price_sales': symbol.get_price_sales(),
-                    'ebitda': symbol.get_ebitda()
-                    'hottness': "NA",
-                    'B/S': "NA"}
+                    'ebitda': symbol.get_ebitda(),
+                    'hottness': ms.hottness_function(i['name']),
+                    'B/S': ms.bs_function(i['name'])}
                 db.infos.insert_one({
                     "name": i['name'],
                     "sector": i['sector'],
@@ -54,10 +55,10 @@ createInfos()
 
 @app.route('/ciu')
 def updateInfos():
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open('static/sp100.json', 'rb') as f:
         ls = json.load(f)
         for i in ls:
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             symbol = Share(i['name'])
             item = {
                 'name': i['name'],
@@ -69,7 +70,7 @@ def updateInfos():
                 'pe': symbol.get_price_earnings_ratio(),
                 'eps': symbol.get_earnings_share(),
                 'price_sales': symbol.get_price_sales(),
-                'ebitda': symbol.get_ebitda()
+                'ebitda': symbol.get_ebitda(),
                 'hottness': "NA",
                 'B/S': "NA"}
             db.infos.update(
@@ -78,8 +79,8 @@ def updateInfos():
                     "$push": {"data": item}
                 }
             )
-    print('Collection Infos updated.')
-    return Response('Collection Infos updated.')
+    print('Collection Infos Updated.')
+    return Response('Collection Infos Updated.')
 # API CID(Collection Infos Delete)
 # Only for Debug Use
 
@@ -87,9 +88,9 @@ def updateInfos():
 @app.route("/cid")
 def deleteInfos():
     db.infos.delete_many({})
-    return Response('Collection Infos deleted.')
+    return Response('Collection Infos Deleted.')
 
-# --------- Stock Twits ----------
+# --------- Route to Manipulate Collection Twits ----------
 # API CTC(Collection Twits Create)
 
 
@@ -113,7 +114,7 @@ def createTwits():
                     item = {
                         'name': msg['user']['username'],
                         'body': msg['body'],
-                        'id': msg['id']
+                        'id': msg['id'],
                         'time': utc.localize(time).astimezone(pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S'),
                         'symbols': [i['symbol'] for i in msg['symbols']],
                         'reshares': msg['reshares']['reshared_count'],
@@ -146,7 +147,7 @@ def updateTwits():
                 item = {
                     'name': msg['user']['username'],
                     'body': msg['body'],
-                    'id': msg['id']
+                    'id': msg['id'],
                     'time': utc.localize(time).astimezone(pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S'),
                     'symbols': [i['symbol'] for i in msg['symbols']],
                     'reshares': msg['reshares']['reshared_count'],
@@ -162,7 +163,7 @@ def deleteTwits():
     db.twits.delete_many({})
     return Response('Collection Twits Deleted.')
 
-# ===============API GET===============
+# ===============Route for API GET===============
 
 # Route for homepage
 
@@ -186,8 +187,8 @@ def section():
     else:
         sector = request.args['sector'][
             0].upper() + request.args['sector'][1:] + " Sector Symbols"
-        data = [i['data'][len(i['data']) - 1] for i in db.info_collection.find(
-            {'sector': request.args['sector']})]
+        data = [i['data'][len(i['data']) - 1]
+                for i in db.infos.find({'sector': request.args['sector']})]
         return Response(json.dumps({sector: data}, default=json_util.default),
                         mimetype='application/json')
 # Route for searching specific symbol and it's general information
