@@ -233,7 +233,7 @@ def hot():
 def bs():
     symbol = request.args['symbol']
     bs = ms.bs_function(symbol)
-    return jsonify(('{} b/s'.format(symbol)): bs)
+    return jsonify({('{} b/s'.format(symbol)): bs})
 # Route for getting price for specific symbol.
 
 
