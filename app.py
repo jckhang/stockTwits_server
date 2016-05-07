@@ -38,7 +38,7 @@ def createInfos():
                     'eps': symbol.get_earnings_share(),
                     'price_sales': symbol.get_price_sales(),
                     'ebitda': symbol.get_ebitda(),
-                    'hottness': ms.hottness_function(i['name']),
+                    'hotness': ms.hotness_function(i['name']),
                     'B/S': ms.bs_function(i['name'])}
                 db.infos.insert_one({
                     "name": i['name'],
@@ -69,7 +69,7 @@ def updateInfos():
                 'eps': symbol.get_earnings_share(),
                 'price_sales': symbol.get_price_sales(),
                 'ebitda': symbol.get_ebitda(),
-                'hottness': ms.hottness_function(i['name']),
+                'hotness': ms.hotness_function(i['name']),
                 'B/S': ms.bs_function(i['name'])}
             db.infos.update(
                 {"data.name": i['name']},
@@ -216,15 +216,15 @@ def twits():
             {"symbols": {"$elemMatch": {"$eq": name}}},
             projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(30)]
     return jsonify({'data': data})
-# Route for testing hottness function
+# Route for testing hotness function
 
 
 @app.route("/hot", methods=['GET'])
 @cross_origin()
 def hot():
     symbol = request.args['symbol']
-    hottness = ms.hottness_function(symbol)
-    return jsonify({('{} hottness'.format(symbol)): hottness})
+    hotness = ms.hotness_function(symbol)
+    return jsonify({('{} hotness'.format(symbol)): hotness})
 # Route for testing b/s function
 
 

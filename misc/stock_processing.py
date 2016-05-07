@@ -8,7 +8,7 @@ db = MONGODBPipeline()
 #   Output: normalized hotness(divide by 1000)
 
 
-def hottness_function(symbol):
+def hotness_function(symbol):
     cursor = db.twits.find(
         {}, projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(1000)
     result = [symbol in i['symbols'] for i in cursor]
