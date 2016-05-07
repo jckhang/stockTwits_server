@@ -12,7 +12,7 @@ def hottness_function(symbol):
     cursor = db.twits.find(
         {}, projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(1000)
     result = [symbol in i['symbols'] for i in cursor]
-    return "%.4f" % (sum(result)/10)
+    return "%.2f" % (sum(result)/10)
 
 # Calculate the B/S ratio of #symbol. Look at the newest 1000 twits and average
 # the sentiment score of each twit. "NULL" is treated as 0, "Bearish" as -1,
