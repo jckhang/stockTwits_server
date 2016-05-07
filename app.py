@@ -116,7 +116,7 @@ def createTwits():
                         'time': utc.localize(time).astimezone(pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S'),
                         'symbols': [i['symbol'] for i in msg['symbols']],
                         'reshares': msg['reshares']['reshared_count'],
-                        'b/s': msg['entities']['sentiment']}
+                        'bs': msg['entities']['sentiment']}
                     items.append(item)
                 db.twits.ensure_index("id", unique=True)
                 db.twits.insert_many(items)
@@ -150,7 +150,7 @@ def updateTwits():
                     'time': utc.localize(time).astimezone(pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S'),
                     'symbols': [i['symbol'] for i in msg['symbols']],
                     'reshares': msg['reshares']['reshared_count'],
-                    'b/s': msg['entities']['sentiment']}
+                    'bs': msg['entities']['sentiment']}
                 items.append(item)
             db.twits.ensure_index("id", unique=True)
             db.twits.insert_many(items)
@@ -178,7 +178,7 @@ def home():
 
 @app.route("/sectors", methods=["GET"])
 @cross_origin()
-def section():
+def sectionAPI():
     if not('sector' in request.args) or (request.args['sector'] == 'All'):
         sector = "S&P 100 Index Symbols"
         data = [i['data'][len(i['data']) - 1]
@@ -196,7 +196,7 @@ def section():
 
 @app.route("/search", methods=["GET"])
 @cross_origin()
-def search():
+def searchAPI():
     name = request.args['symbol']
     data = [i['data'][-10:] for i in db.infos.find({'name': name})]
     return jsonify({'data': data})
@@ -205,7 +205,7 @@ def search():
 
 @app.route("/twits", methods=["GET"])
 @cross_origin()
-def twits():
+def twitsAPI():
     if not('symbol' in request.args) or (request.args['symbol'] == 'All'):
         data = [i for i in db.twits.find(
             {}, projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(30)]
