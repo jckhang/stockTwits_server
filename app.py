@@ -224,7 +224,7 @@ def twits():
 def hot():
     symbol = request.args['symbol']
     hottness = ms.hottness_function(symbol)
-    return jsonif({('{} hottness'.format(symbol)): hottness})
+    return jsonify({('{} hottness'.format(symbol)): hottness})
 # Route for testing b/s function
 
 
