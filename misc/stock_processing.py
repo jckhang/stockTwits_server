@@ -1,17 +1,29 @@
-from settings import ACCESS_TOKEN, MONGODBPipeline
+from settings import MONGODBPipeline
 db = MONGODBPipeline()
-print ACCESS_TOKEN
-# Calculate the hottness of #symbol. The basic approach is to sum up the total
-# number of twits that contain that symbol.
+# Calculate the hottness of #symbol. Look at the newest 1000 twits and sum up
+# the number of twits that contain that symbol.
+# Parameters:
+#   Input: symbol name
+#   Output: normalized hotness(divide by 1000)
 
 
 def hottness_function(symbol):
-    data = [i['data'][-10:] for i in db.infos.find({'name': symbol})]
+    cursor = db.twits.find(
+        {}, projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(1000)
+    recent100Twits = [i for i in cursor]
+
     return "NA"
 
-# Calculate the B/S ratio of #symbol. The basic approach is to average the sent-
-# iment score of each twit.
+# Calculate the B/S ratio of #symbol. Look at the newest 1000 twits and average
+# the sentiment score of each twit. "NULL" is treated as 0, "Bearish" as -1,
+# and "Bullish" as 1.
+# Parameters:
+#   Input: symbol name
+#   Output: average sentiment score
 
 
 def bs_function(symbol):
+    data = [i for i in db.twits.find(
+        {"symbols": {"$elemMatch": {"$eq": symbol}}},
+        projection={"_id": 0, "id": 0, "reshares": 0}).sort("time", -1).limit(100)]
     return "NA"

@@ -167,7 +167,6 @@ def deleteTwits():
     return Response('Collection Twits Deleted.')
 
 # ===============Route for API GET===============
-
 # Route for homepage
 
 
@@ -217,6 +216,24 @@ def twits():
             {"symbols": {"$elemMatch": {"$eq": name}}},
             projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(30)]
     return jsonify({'data': data})
+# Route for testing hottness function
+
+
+@app.route("/hot", methods=['GET'])
+@cross_origin()
+def hot():
+    symbol = request.args['symbol']
+    hottness = ms.hottness_function(symbol)
+    return jsonif({('{} hottness'.format(symbol)): hottness})
+# Route for testing b/s function
+
+
+@app.route("/bs", methods=['GET'])
+@cross_origin()
+def bs():
+    symbol = request.args['symbol']
+    bs = ms.bs_function(symbol)
+    return jsonify(('{} b/s'.format(symbol)): bs)
 # Route for getting price for specific symbol.
 
 
