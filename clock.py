@@ -1,5 +1,7 @@
+import logging
 from apscheduler.schedulers.blocking import BlockingScheduler
 from app import updateTwits, updateInfos
+logging.basicConfig()
 sched = BlockingScheduler()
 
 
