@@ -32,4 +32,4 @@ def bs_function(symbol):
         {"symbols": {"$elemMatch": {"$eq": symbol}}},
         projection={"_id": 0, "id": 0, "reshares": 0}).sort("time", -1).limit(1000)
     result = [bs(i['b/s']) for i in cursor]
-    return result
+    return "%.4f" % (sum(result) / 1000)
