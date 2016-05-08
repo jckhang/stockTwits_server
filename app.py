@@ -102,15 +102,16 @@ def createTwits():
     if db.twits.count() == 0:
         with open('static/sp100.json', 'rb') as f:
             ls = json.load(f)
-            unirest.timeout(20)
+            db.twits.ensure_index("id", unique=True)
             url = "https://api.stocktwits.com/api/2/streams/symbol/{}.json?access_token={}"
             for i in ls:
+                unirest.timeout(200)
                 response = unirest.get(url.format(
                     i['name'], ACCESS_TOKEN))
                 data = response.body
                 msgs = data['messages']
-                items = []
                 print(len(msgs))
+                items = []
                 for msg in msgs:
                     time = datetime.strptime(
                         msg['created_at'], "%Y-%m-%dT%H:%M:%SZ")
@@ -124,8 +125,8 @@ def createTwits():
                         'reshares': msg['reshares']['reshared_count'],
                         'bs': bs(msg['entities']['sentiment'])}
                     items.append(item)
-                db.twits.ensure_index("id", unique=True)
-                db.twits.insert_many(items)
+                bulkop = db.twits.initialize_unordered_bulk_op()
+                bulkop.insert(item)
         print('Collection Twits Created.')
         return Response('Collection Twits Created.')
 
@@ -143,8 +144,9 @@ def updateTwits():
     with open('static/sp100.json', 'rb') as f:
         ls = json.load(f)
         url = "https://api.stocktwits.com/api/2/streams/symbol/{}.json?access_token={}"
+        db.twits.ensure_index("id", unique=True)
         for i in ls:
-            unirest.timeout(20)
+            unirest.timeout(200)
             response = unirest.get(url.format(
                 i['name'], ACCESS_TOKEN))
             data = response.body
@@ -153,8 +155,8 @@ def updateTwits():
             for msg in msgs:
                 time = datetime.strptime(
                     msg['created_at'], "%Y-%m-%dT%H:%M:%SZ")
-                utc = pytz.utc
-                item = {
+                utc=pytz.utc
+                item={
                     'name': msg['user']['username'],
                     'body': msg['body'],
                     'id': msg['id'],
@@ -163,8 +165,8 @@ def updateTwits():
                     'reshares': msg['reshares']['reshared_count'],
                     'bs': bs(msg['entities']['sentiment'])}
                 items.append(item)
-            db.twits.ensure_index("id", unique=True)
-            db.twits.insert_many(items)
+            bulkop = db.twits.initialize_unordered_bulk_op()
+            bulkop.insert(item)
     print('Collection Twits Update.')
     return Response('Collection Twits Updated.')
 # API CTD(Collection Twits Delete)
