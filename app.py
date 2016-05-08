@@ -164,7 +164,7 @@ def updateTwits():
                     'bs': bs(msg['entities']['sentiment'])}
                 items.append(item)
             db.twits.ensure_index("id", unique=True)
-            db.twits.insert_many(items)
+            db.twits.insert(items)
     print('Collection Twits Update.')
     return Response('Collection Twits Updated.')
 # API CTD(Collection Twits Delete)
