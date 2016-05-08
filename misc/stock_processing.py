@@ -23,13 +23,8 @@ def hotness_function(symbol):
 
 
 def bs_function(symbol):
-    def bs(record):
-        if record is None:
-            return 0
-        else:
-            return 1 if record['basic'] == "Bullish" else -1
     cursor = db.twits.find(
         {"symbols": {"$elemMatch": {"$eq": symbol}}},
         projection={"_id": 0, "id": 0, "reshares": 0}).sort("time", -1).limit(1000)
-    result = [bs(i['bs']) for i in cursor]
+    result = [i['bs'] for i in cursor]
     return "%.4f" % (sum(result) / 1000)
