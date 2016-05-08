@@ -110,6 +110,7 @@ def createTwits():
                 data = response.body
                 msgs = data['messages']
                 items = []
+                print(len(msgs))
                 for msg in msgs:
                     time = datetime.strptime(
                         msg['created_at'], "%Y-%m-%dT%H:%M:%SZ")
@@ -124,7 +125,7 @@ def createTwits():
                         'bs': bs(msg['entities']['sentiment'])}
                     items.append(item)
                 db.twits.ensure_index("id", unique=True)
-                db.twits.insert_many(items)
+                db.twits.insert_one(items)
         print('Collection Twits Created.')
         return Response('Collection Twits Created.')
 
