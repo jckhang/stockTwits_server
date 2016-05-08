@@ -98,7 +98,7 @@ def createTwits():
         if record is None:
             return 0
         else:
-            return 1 if record['basic'] == "Bullrish" else -1
+            return 1 if record['basic'] == "Bullish" else -1
     if db.twits.count() == 0:
         with open('static/sp100.json', 'rb') as f:
             ls = json.load(f)
@@ -138,7 +138,7 @@ def updateTwits():
         if record is None:
             return 0
         else:
-            return 1 if record['basic'] == "Bullrish" else -1
+            return 1 if record['basic'] == "Bullish" else -1
     with open('static/sp100.json', 'rb') as f:
         ls = json.load(f)
         url = "https://api.stocktwits.com/api/2/streams/symbol/{}.json?access_token={}"

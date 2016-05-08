@@ -27,7 +27,7 @@ def bs_function(symbol):
         if record is None:
             return 0
         else:
-            return 1 if record['basic'] == "Bullrish" else -1
+            return 1 if record['basic'] == "Bullish" else -1
     cursor = db.twits.find(
         {"symbols": {"$elemMatch": {"$eq": symbol}}},
         projection={"_id": 0, "id": 0, "reshares": 0}).sort("time", -1).limit(1000)
