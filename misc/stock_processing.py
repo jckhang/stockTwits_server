@@ -31,5 +31,5 @@ def bs_function(symbol):
     cursor = db.twits.find(
         {"symbols": {"$elemMatch": {"$eq": symbol}}},
         projection={"_id": 0, "id": 0, "reshares": 0}).sort("time", -1).limit(1000)
-    result = [bs(i['b/s']) for i in cursor]
+    result = [bs(i['bs']) for i in cursor]
     return "%.4f" % (sum(result) / 1000)
