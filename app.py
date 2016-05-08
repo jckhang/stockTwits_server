@@ -121,7 +121,7 @@ def createTwits():
                         'time': utc.localize(time).astimezone(pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S'),
                         'symbols': [i['symbol'] for i in msg['symbols']],
                         'reshares': msg['reshares']['reshared_count'],
-                        'bs': bs(msg['entities']['sentiment']})
+                        'bs': bs(msg['entities']['sentiment'])}
                     items.append(item)
                 db.twits.ensure_index("id", unique=True)
                 db.twits.insert_many(items)
@@ -160,7 +160,7 @@ def updateTwits():
                     'time': utc.localize(time).astimezone(pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S'),
                     'symbols': [i['symbol'] for i in msg['symbols']],
                     'reshares': msg['reshares']['reshared_count'],
-                    'bs': bs(msg['entities']['sentiment']})
+                    'bs': bs(msg['entities']['sentiment'])}
                 items.append(item)
             db.twits.ensure_index("id", unique=True)
             db.twits.insert_many(items)
