@@ -39,7 +39,7 @@ def createInfos():
                     'price_sales': symbol.get_price_sales(),
                     'ebitda': symbol.get_ebitda(),
                     'hotness': ms.hotness_function(i['name']),
-                    'B/S': ms.bs_function(i['name'])}
+                    'BS': ms.bs_function(i['name'])}
                 db.infos.insert_one({
                     "name": i['name'],
                     "sector": i['sector'],
@@ -70,7 +70,7 @@ def updateInfos():
                 'price_sales': symbol.get_price_sales(),
                 'ebitda': symbol.get_ebitda(),
                 'hotness': ms.hotness_function(i['name']),
-                'B/S': ms.bs_function(i['name'])}
+                'BS': ms.bs_function(i['name'])}
             db.infos.update(
                 {"data.name": i['name']},
                 {
@@ -225,7 +225,7 @@ def hot():
     symbol = request.args['symbol']
     hotness = ms.hotness_function(symbol)
     return jsonify({('{} hotness'.format(symbol)): hotness})
-# Route for testing b/s function
+# Route for testing bs function
 
 
 @app.route("/bs", methods=['GET'])
@@ -233,7 +233,7 @@ def hot():
 def bs():
     symbol = request.args['symbol']
     bs = ms.bs_function(symbol)
-    return jsonify({('{} b/s'.format(symbol)): bs})
+    return jsonify({('{} bs'.format(symbol)): bs})
 # Route for getting price for specific symbol.
 
 
