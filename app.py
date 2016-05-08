@@ -94,6 +94,11 @@ def deleteInfos():
 
 @app.route('/ctc')
 def createTwits():
+    def bs(record):
+        if record is None:
+            return 0
+        else:
+            return 1 if record['basic'] == "Bullrish" else -1
     if db.twits.count() == 0:
         with open('static/sp100.json', 'rb') as f:
             ls = json.load(f)
@@ -116,7 +121,7 @@ def createTwits():
                         'time': utc.localize(time).astimezone(pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S'),
                         'symbols': [i['symbol'] for i in msg['symbols']],
                         'reshares': msg['reshares']['reshared_count'],
-                        'bs': msg['entities']['sentiment']}
+                        'bs': bs(msg['entities']['sentiment']})
                     items.append(item)
                 db.twits.ensure_index("id", unique=True)
                 db.twits.insert_many(items)
@@ -129,6 +134,11 @@ createTwits()
 
 @app.route('/ctu')
 def updateTwits():
+    def bs(record):
+        if record is None:
+            return 0
+        else:
+            return 1 if record['basic'] == "Bullrish" else -1
     with open('static/sp100.json', 'rb') as f:
         ls = json.load(f)
         url = "https://api.stocktwits.com/api/2/streams/symbol/{}.json?access_token={}"
@@ -150,7 +160,7 @@ def updateTwits():
                     'time': utc.localize(time).astimezone(pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S'),
                     'symbols': [i['symbol'] for i in msg['symbols']],
                     'reshares': msg['reshares']['reshared_count'],
-                    'bs': msg['entities']['sentiment']}
+                    'bs': bs(msg['entities']['sentiment']})
                 items.append(item)
             db.twits.ensure_index("id", unique=True)
             db.twits.insert_many(items)
