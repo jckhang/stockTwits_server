@@ -155,8 +155,8 @@ def updateTwits():
             for msg in msgs:
                 time = datetime.strptime(
                     msg['created_at'], "%Y-%m-%dT%H:%M:%SZ")
-                utc=pytz.utc
-                item={
+                utc = pytz.utc
+                item = {
                     'name': msg['user']['username'],
                     'body': msg['body'],
                     'id': msg['id'],
