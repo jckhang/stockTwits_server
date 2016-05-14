@@ -218,7 +218,7 @@ def sectionAPI():
 def searchAPI():
     name = request.args['symbol']
     data = [j
-            for i in db.infos.find({'name': name}) for j in i['data']]
+            for i in db.infos.find({'name': name}) for j in i['data'][-30:]]
     return jsonify({'data': data})
 # Route for searching specific symbol and return it's first 30 twits
 
@@ -262,7 +262,7 @@ def bs():
 def price():
     name = request.args['symbol']
     data = [j['price']
-            for i in db.infos.find({'name': name}) for j in i['data']]
+            for i in db.infos.find({'name': name}) for j in i['data'][-30:]]
     return jsonify({'data': data})
 # Error Handler
 
