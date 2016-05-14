@@ -1,3 +1,4 @@
+from __future__ import print_function
 from flask import Flask, render_template, request, json, jsonify, Response
 from flask.ext.cors import CORS, cross_origin
 from datetime import datetime
@@ -39,7 +40,7 @@ def createInfos():
                     'price_sales': symbol.get_price_sales(),
                     'ebitda': symbol.get_ebitda(),
                     'hotness': ms.hotness_function(i['name']),
-                    'BS': ms.bs_function(i['name'])}
+                    'BS': "NA"}  # ms.bs_function(i['name'])}
                 db.infos.insert_one({
                     "name": i['name'],
                     "sector": i['sector'],
@@ -47,7 +48,7 @@ def createInfos():
                 })
         print('Collection Infos Created.')
         return Response('Collection Infos Created.')
-createInfos()
+# createInfos()
 # API CIU(Collection Iinfo Update)
 
 
@@ -102,7 +103,6 @@ def createTwits():
     if db.twits.count() == 0:
         with open('static/sp100.json', 'rb') as f:
             ls = json.load(f)
-            db.twits.ensure_index("id", unique=True)
             url = "https://api.stocktwits.com/api/2/streams/symbol/{}.json?access_token={}"
             for i in ls:
                 unirest.timeout(200)
@@ -110,7 +110,8 @@ def createTwits():
                     i['name'], ACCESS_TOKEN))
                 data = response.body
                 msgs = data['messages']
-                print(len(msgs))
+                print("Creating", i['name'], '....')
+                print(db.twits.count())
                 items = []
                 for msg in msgs:
                     time = datetime.strptime(
@@ -125,12 +126,11 @@ def createTwits():
                         'reshares': msg['reshares']['reshared_count'],
                         'bs': bs(msg['entities']['sentiment'])}
                     items.append(item)
-                bulkop = db.twits.initialize_unordered_bulk_op()
-                bulkop.insert(item)
+                    db.twits.replace_one(item, item, True)
         print('Collection Twits Created.')
         return Response('Collection Twits Created.')
 
-createTwits()
+# createTwits()
 # API CTU(Collection Twits Update)
 
 
@@ -144,13 +144,13 @@ def updateTwits():
     with open('static/sp100.json', 'rb') as f:
         ls = json.load(f)
         url = "https://api.stocktwits.com/api/2/streams/symbol/{}.json?access_token={}"
-        db.twits.ensure_index("id", unique=True)
         for i in ls:
             unirest.timeout(200)
             response = unirest.get(url.format(
                 i['name'], ACCESS_TOKEN))
             data = response.body
             msgs = data['messages']
+            print("Updating", i['name'])
             items = []
             for msg in msgs:
                 time = datetime.strptime(
@@ -164,9 +164,8 @@ def updateTwits():
                     'symbols': [i['symbol'] for i in msg['symbols']],
                     'reshares': msg['reshares']['reshared_count'],
                     'bs': bs(msg['entities']['sentiment'])}
-                items.append(item)
-            bulkop = db.twits.initialize_unordered_bulk_op()
-            bulkop.insert(item)
+                db.twits.replace_one(item, item, True)
+            print(db.twits.count())
     print('Collection Twits Update.')
     return Response('Collection Twits Updated.')
 # API CTD(Collection Twits Delete)
