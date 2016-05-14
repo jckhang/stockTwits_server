@@ -149,7 +149,7 @@ def updateTwits():
             data = response.body
             msgs = data['messages']
             print("Updating", i['name'])
-            items = []
+            print(db.twits.count())
             for msg in msgs:
                 time = datetime.strptime(
                     msg['created_at'], "%Y-%m-%dT%H:%M:%SZ")
@@ -163,7 +163,7 @@ def updateTwits():
                     'reshares': msg['reshares']['reshared_count'],
                     'bs': bs(msg['entities']['sentiment'])}
                 db.twits.replace_one(item, item, True)
-            print(db.twits.count())
+
     print('Collection Twits Update.')
     return Response('Collection Twits Updated.')
 # API CTD(Collection Twits Delete)
