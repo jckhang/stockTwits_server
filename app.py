@@ -215,7 +215,8 @@ def sectionAPI():
 @cross_origin()
 def searchAPI():
     name = request.args['symbol']
-    data = [i['data'][-10:] for i in db.infos.find({'name': name})]
+    data = [j
+            for i in db.infos.find({'name': name}) for j in i['data']]
     return jsonify({'data': data})
 # Route for searching specific symbol and return it's first 30 twits
 
@@ -258,7 +259,8 @@ def bs():
 @cross_origin()
 def price():
     name = request.args['symbol']
-    data = [i for i in db.infos.find({'name': name})]
+    data = [j['price']
+            for i in db.infos.find({'name': name}) for j in i['data']]
     return jsonify({'data': data})
 # Error Handler
 
