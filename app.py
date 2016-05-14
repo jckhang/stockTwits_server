@@ -111,8 +111,8 @@ def createTwits():
                     i['name'], ACCESS_TOKEN))
                 data = response.body
                 msgs = data['messages']
-                print("Creating", i['name'], '....')
-                print(db.twits.count())
+                # print("Creating", i['name'], '....')
+                # print(db.twits.count())
                 for msg in msgs:
                     time = datetime.strptime(
                         msg['created_at'], "%Y-%m-%dT%H:%M:%SZ")
@@ -152,8 +152,8 @@ def updateTwits():
                 i['name'], ACCESS_TOKEN))
             data = response.body
             msgs = data['messages']
-            print("Updating", i['name'])
-            print(db.twits.count())
+            # print("Updating", i['name'])
+            # print(db.twits.count())
             for msg in msgs:
                 time = datetime.strptime(
                     msg['created_at'], "%Y-%m-%dT%H:%M:%SZ")
