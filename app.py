@@ -55,6 +55,7 @@ def createInfos():
 
 @app.route('/ciu')
 def updateInfos():
+    print("Updating Infos!")
     with open('static/sp100.json', 'rb') as f:
         ls = json.load(f)
         for i in ls:
@@ -143,6 +144,7 @@ def updateTwits():
             return 0
         else:
             return 1 if record['basic'] == "Bullish" else -1
+    print("Updating Twits!!")
     with open('static/sp100.json', 'rb') as f:
         ls = json.load(f)
         url = "https://api.stocktwits.com/api/2/streams/symbol/{}.json?access_token={}"
