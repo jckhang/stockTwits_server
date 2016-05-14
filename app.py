@@ -5,7 +5,7 @@ from datetime import datetime
 from yahoo_finance import Share
 import unirest
 import pytz
-from misc.settings import ACCESS_TOKEN, MONGODBPipeline, timeout
+from misc.settings import ACCESS_TOKEN, MONGODBPipeline
 import misc.stock_processing as ms
 import pymongo
 # App config
@@ -21,7 +21,6 @@ db = MONGODBPipeline()
 # API CIC(Collection Infos Create)
 
 
-@timeout
 @app.route('/cic')
 def createInfos():
     if db.infos.count() == 0:
@@ -54,7 +53,6 @@ def createInfos():
 # API CIU(Collection Iinfo Update)
 
 
-@timeout
 @app.route('/ciu')
 def updateInfos():
     with open('static/sp100.json', 'rb') as f:
@@ -96,7 +94,6 @@ def deleteInfos():
 # API CTC(Collection Twits Create)
 
 
-@timeout
 @app.route('/ctc')
 def createTwits():
     def bs(record):
@@ -139,7 +136,6 @@ def createTwits():
 # API CTU(Collection Twits Update)
 
 
-@timeout
 @app.route('/ctu')
 def updateTwits():
     def bs(record):
@@ -261,7 +257,9 @@ def bs():
 @app.route('/price', methods=["GET"])
 @cross_origin()
 def price():
-    pass
+    name = request.args['symbol']
+    data = [i for i in db.infos.find({'name': name})]
+    return jsonify({'data': data})
 # Error Handler
 
 
