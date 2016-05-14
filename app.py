@@ -5,8 +5,9 @@ from datetime import datetime
 from yahoo_finance import Share
 import unirest
 import pytz
-from misc.settings import ACCESS_TOKEN, MONGODBPipeline
+from misc.settings import ACCESS_TOKEN, MONGODBPipeline, timeout
 import misc.stock_processing as ms
+import pymongo
 # App config
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -20,6 +21,7 @@ db = MONGODBPipeline()
 # API CIC(Collection Infos Create)
 
 
+@timeout
 @app.route('/cic')
 def createInfos():
     if db.infos.count() == 0:
@@ -52,6 +54,7 @@ def createInfos():
 # API CIU(Collection Iinfo Update)
 
 
+@timeout
 @app.route('/ciu')
 def updateInfos():
     with open('static/sp100.json', 'rb') as f:
@@ -93,6 +96,7 @@ def deleteInfos():
 # API CTC(Collection Twits Create)
 
 
+@timeout
 @app.route('/ctc')
 def createTwits():
     def bs(record):
@@ -124,7 +128,10 @@ def createTwits():
                         'symbols': [i['symbol'] for i in msg['symbols']],
                         'reshares': msg['reshares']['reshared_count'],
                         'bs': bs(msg['entities']['sentiment'])}
-                    db.twits.replace_one(item, item, True)
+                    try:
+                        db.twits.replace_one(item, item, True)
+                    except pymongo.errors.DuplicateKeyError:
+                        pass
         print('Collection Twits Created.')
         return Response('Collection Twits Created.')
 
@@ -132,6 +139,7 @@ def createTwits():
 # API CTU(Collection Twits Update)
 
 
+@timeout
 @app.route('/ctu')
 def updateTwits():
     def bs(record):
@@ -162,7 +170,10 @@ def updateTwits():
                     'symbols': [i['symbol'] for i in msg['symbols']],
                     'reshares': msg['reshares']['reshared_count'],
                     'bs': bs(msg['entities']['sentiment'])}
-                db.twits.replace_one(item, item, True)
+                try:
+                    db.twits.replace_one(item, item, True)
+                except pymongo.errors.DuplicateKeyError:
+                    pass
 
     print('Collection Twits Update.')
     return Response('Collection Twits Updated.')
