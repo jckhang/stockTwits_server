@@ -40,7 +40,7 @@ def createInfos():
                     'price_sales': symbol.get_price_sales(),
                     'ebitda': symbol.get_ebitda(),
                     'hotness': ms.hotness_function(i['name']),
-                    'BS': "NA"}  # ms.bs_function(i['name'])}
+                    'BS': ms.bs_function(i['name'])}
                 db.infos.insert_one({
                     "name": i['name'],
                     "sector": i['sector'],
@@ -112,7 +112,6 @@ def createTwits():
                 msgs = data['messages']
                 print("Creating", i['name'], '....')
                 print(db.twits.count())
-                items = []
                 for msg in msgs:
                     time = datetime.strptime(
                         msg['created_at'], "%Y-%m-%dT%H:%M:%SZ")
@@ -125,7 +124,6 @@ def createTwits():
                         'symbols': [i['symbol'] for i in msg['symbols']],
                         'reshares': msg['reshares']['reshared_count'],
                         'bs': bs(msg['entities']['sentiment'])}
-                    items.append(item)
                     db.twits.replace_one(item, item, True)
         print('Collection Twits Created.')
         return Response('Collection Twits Created.')
