@@ -210,7 +210,7 @@ def searchAPI():
     name = request.args['symbol']
     data = [i['data'][-10:] for i in db.infos.find({'name': name})]
     return jsonify({'data': data})
-# Route for searching specific symbol and return it's twits
+# Route for searching specific symbol and return it's first 30 twits
 
 
 @app.route("/twits", methods=["GET"])
