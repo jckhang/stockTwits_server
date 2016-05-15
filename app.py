@@ -268,8 +268,9 @@ def sparkline():
             for i in db.infos.find({'name': name}) for j in i['data']]
     return jsonify({'price': price,
                     'BS': bs,
+                    'time': time,
                     'start': time[0][11:13] + ':00',
-                    'end': time[-1][11:13] + ':00'})
+                    'end': time[-1][11:12] + ':00'})
 # Error Handler
 
 
