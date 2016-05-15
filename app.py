@@ -236,25 +236,6 @@ def twitsAPI():
             {"symbols": {"$elemMatch": {"$eq": name}}},
             projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(30)]
     return jsonify({'data': data})
-# # Route for testing hotness function
-#
-#
-# @app.route("/hot", methods=['GET'])
-# @cross_origin()
-# def hot():
-#     symbol = request.args['symbol']
-#     hotness = ms.hotness_function(symbol)
-#     return jsonify({('{} hotness'.format(symbol)): hotness})
-# # Route for testing bs function
-#
-#
-# @app.route("/bs", methods=['GET'])
-# @cross_origin()
-# def bs():
-#     symbol = request.args['symbol']
-#     bs = ms.bs_function(symbol)
-#     return jsonify({('{} bs'.format(symbol)): bs})
-# Route for getting price for specific symbol.
 
 
 @app.route('/price', methods=["GET"])
@@ -274,6 +255,26 @@ def not_found(error=None):
         'message': 'Not Found: ' + request.url,
     }
     return jsonify(message)
+# # # Testing
+# # : Route for testing hotness function
+#
+#
+# @app.route("/hot", methods=['GET'])
+# @cross_origin()
+# def hot():
+#     symbol = request.args['symbol']
+#     hotness = ms.hotness_function(symbol)
+#     return jsonify({('{} hotness'.format(symbol)): hotness})
+# # Route for testing bs function
+#
+#
+# @app.route("/bs", methods=['GET'])
+# @cross_origin()
+# def bs():
+#     symbol = request.args['symbol']
+#     bs = ms.bs_function(symbol)
+#     return jsonify({('{} bs'.format(symbol)): bs})
+# Route for getting price for specific symbol.
 
 if __name__ == "__main__":
     app.run(debug=True)
