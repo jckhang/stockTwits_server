@@ -256,13 +256,16 @@ def twitsAPI():
     return jsonify({'data': data})
 
 
-@app.route('/price', methods=["GET"])
+@app.route('/sparkline', methods=["GET"])
 @cross_origin()
-def price():
+def sparkline():
     name = request.args['symbol']
-    data = [j['price']
-            for i in db.infos.find({'name': name}) for j in i['data'][-30:]]
-    return jsonify({'data': data})
+    price = [j['price']
+             for i in db.infos.find({'name': name}) for j in i['data'][-30:]]
+    bs = [j['BS']
+          for i in db.infos.find({'name': name}) for j in i['data'][-30:]]
+    return jsonify({'price': price,
+                    'BS': bs})
 # Error Handler
 
 
