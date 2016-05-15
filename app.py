@@ -261,11 +261,15 @@ def twitsAPI():
 def sparkline():
     name = request.args['symbol']
     price = [j['price']
-             for i in db.infos.find({'name': name}) for j in i['data'][-30:]]
+             for i in db.infos.find({'name': name}) for j in i['data']]
     bs = [j['BS']
-          for i in db.infos.find({'name': name}) for j in i['data'][-30:]]
+          for i in db.infos.find({'name': name}) for j in i['data']]
+    time = [j['time']
+            for i in db.infos.find({'name': name}) for j in i['data']]
     return jsonify({'price': price,
-                    'BS': bs})
+                    'BS': bs,
+                    'start': time[0],
+                    'end': time[-1]})
 # Error Handler
 
 
