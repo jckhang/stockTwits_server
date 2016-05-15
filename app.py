@@ -195,7 +195,11 @@ def updateTwits():
 
 @app.route("/ctd")
 def deleteTwits():
-    db.twits.delete_many({})
+    date = datetime.now()
+    start = date.replace(hour=0, minute=0).strftime("%Y-%m-%d %H:%M:%S")
+    db.twits.remove({"time":
+                     {"$lt": start}
+                     })
     print('Collection Twits Deleted.')
     return Response('Collection Twits Deleted.')
 
