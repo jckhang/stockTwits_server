@@ -24,6 +24,7 @@ db = MONGODBPipeline()
 @app.route('/cic')
 def createInfos():
     if db.infos.count() == 0:
+        print("Creating Infos!!")
         with open('static/sp100.json', 'rb') as f:
             ls = json.load(f)
             for i in ls:
@@ -132,6 +133,7 @@ def createTwits():
                         pass
         print('Collection Twits Created.')
         return Response('Collection Twits Created.')
+    return Response('Error Occurs.')
 
 # createTwits()
 # API CTU(Collection Twits Update)
@@ -256,6 +258,16 @@ def not_found(error=None):
     }
     return jsonify(message)
 # # # Testing
+
+
+@app.route('/time', methods=["GET"])
+def time():
+    date = datetime.now()
+    start = date.replace(hour=9, minute=0).strftime("%Y-%m-%d %H:%M:%S")
+    end = date.replace(hour=17, minute=0).strftime("%Y-%m-%d %H:%M:%S")
+    # db.infos.remove({}'data.time': {"$lt": start}})
+    data = [j for i in db.infos.find({'name': 'AAPL', 'data.time': {"$gt": start}}) for j in i['data']]
+    return jsonify({'data': data})
 # # : Route for testing hotness function
 #
 #
