@@ -266,7 +266,7 @@ def time():
     start = date.replace(hour=9, minute=0).strftime("%Y-%m-%d %H:%M:%S")
     end = date.replace(hour=17, minute=0).strftime("%Y-%m-%d %H:%M:%S")
     # db.infos.remove({}'data.time': {"$lt": start}})
-    data = [j if j['time'] > start else "" for i in db.infos.find({'name': 'AAPL'}) for j in i['data']]
+    data = [j if j['time'] > start else for i in db.infos.find({'name': 'AAPL'}) for j in i['data']]
     return jsonify({'data': data})
 # # : Route for testing hotness function
 #
