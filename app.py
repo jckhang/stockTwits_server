@@ -270,7 +270,7 @@ def sparkline():
                     'BS': bs,
                     'time': time,
                     'start': time[0][11:13] + ':00',
-                    'end': time[-1][11:12] + ':00'})
+                    'end': time[-1][11:13] + ':00'})
 # Error Handler
 
 
