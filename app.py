@@ -76,7 +76,7 @@ def updateInfos():
                 'hotness': ms.hotness_function(i['name']),
                 'BS': ms.bs_function(i['name'])}
             db.infos.update(
-                {"data.name": i['name']},
+                {"name": i['name']},
                 {
                     "$push": {"data": item}
                 }
@@ -89,7 +89,19 @@ def updateInfos():
 
 @app.route("/cid")
 def deleteInfos():
-    db.infos.delete_many({})
+    date = datetime.now()
+    start = date.replace(hour=9, minute=0).strftime("%Y-%m-%d %H:%M:%S")
+
+    with open('static/sp100.json', 'rb') as f:
+        ls = json.load(f)
+        for i in ls:
+            data = filter(lambda x: x['time'] > start, [
+                          j for i in db.infos.find({'name': i['name']}) for j in i['data']])
+            db.infos.update_one({'name': i['name']}, {
+                '$set': {
+                    'data': data
+                }
+            }, upsert=False)
     return Response('Collection Infos Deleted.')
 
 # --------- Route to Manipulate Collection Twits ----------
@@ -258,17 +270,6 @@ def not_found(error=None):
     }
     return jsonify(message)
 # # # Testing
-
-
-@app.route('/time', methods=["GET"])
-def time():
-    date = datetime.now()
-    start = date.replace(hour=9, minute=0).strftime("%Y-%m-%d %H:%M:%S")
-    end = date.replace(hour=17, minute=0).strftime("%Y-%m-%d %H:%M:%S")
-    # db.infos.remove({}'data.time': {"$lt": start}})
-    data = filter(lambda x: x['time'] > start, [
-                  j for i in db.infos.find({'name': 'AAPL'}) for j in i['data']])
-    return jsonify({'data': data})
 # # : Route for testing hotness function
 #
 #
