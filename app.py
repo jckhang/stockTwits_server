@@ -219,7 +219,7 @@ def home():
 @app.route("/sectors", methods=["GET"])
 @cross_origin()
 def sectionAPI():
-    if not('sector' in request.args) or (request.args['sector'] == 'All'):
+    if not('sector' in request.args) or (request.args['sector'] == 'all'):
         sector = "S&P 100 Index Symbols"
         data = [i['data'][len(i['data']) - 1]
                 for i in db.infos.find()]
@@ -247,7 +247,7 @@ def searchAPI():
 @app.route("/twits", methods=["GET"])
 @cross_origin()
 def twitsAPI():
-    if not('symbol' in request.args) or (request.args['symbol'] == 'All'):
+    if not('symbol' in request.args) or (request.args['symbol'] == 'all'):
         data = [i for i in db.twits.find(
             {}, projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(30)]
         return jsonify({'data': data})
