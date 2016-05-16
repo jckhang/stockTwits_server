@@ -84,7 +84,6 @@ def updateInfos():
     print('Collection Infos Updated.')
     return Response('Collection Infos Updated.')
 # API CID(Collection Infos Delete)
-# Only for Debug Use
 
 
 @app.route("/cid")
@@ -190,7 +189,6 @@ def updateTwits():
     print('Collection Twits Update.')
     return Response('Collection Twits Updated.')
 # API CTD(Collection Twits Delete)
-# Only for Debug Use
 
 
 @app.route("/ctd")
@@ -202,7 +200,12 @@ def deleteTwits():
                      })
     print('Collection Twits Deleted.')
     return Response('Collection Twits Deleted.')
+# API CKC(Collection Keyword Create)
 
+
+@app.route("/ckc")
+def createKeyword():
+    pass
 # ===============Route for API GET===============
 # Route for homepage
 
@@ -285,12 +288,12 @@ def not_found(error=None):
 # # : Route for testing hotness function
 #
 #
-# @app.route("/hot", methods=['GET'])
-# @cross_origin()
-# def hot():
-#     symbol = request.args['symbol']
-#     hotness = ms.hotness_function(symbol)
-#     return jsonify({('{} hotness'.format(symbol)): hotness})
+@app.route("/hot", methods=['GET'])
+@cross_origin()
+def hot():
+    symbol = request.args['symbol']
+    hotness = ms.hotness_function(symbol)
+    return jsonify({('{} hotness'.format(symbol)): hotness})
 # # Route for testing bs function
 #
 #
