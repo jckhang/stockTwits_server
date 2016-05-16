@@ -10,7 +10,7 @@ db = MONGODBPipeline()
 
 def hotness_function(symbol):
     cursor = db.twits.find(
-        {}, projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(1000)
+        {}, projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1)
     result = [symbol in i['symbols'] for i in cursor]
     # print(result)
     return "%.2f" % (sum(result) / db.twits.count())
