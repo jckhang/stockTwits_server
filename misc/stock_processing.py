@@ -1,5 +1,6 @@
 from __future__ import division
 from settings import MONGODBPipeline
+import collections
 db = MONGODBPipeline()
 # Calculate the hottness of #symbol. Look at the newest 1000 twits and sum up
 # the number of twits that contain that symbol.
@@ -43,4 +44,8 @@ def regex(st):
     st_re = re.sub(r'(?i)\&\w+', "", st_re)
     # Remove https
     st_re = re.sub('((www\.[\s]+)|https?://[^\s]+)', "", st_re)
-    return st_re.split(" ")
+    # Remove special symbols
+    st_re = re.sub("[^\w']", " ", st_re)
+    # Remove extra spaces
+    st_re = re.sub(' +', ' ', st_re)
+    return collections.Counter(st_re.split(" "))

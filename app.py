@@ -8,6 +8,8 @@ import pytz
 from misc.settings import ACCESS_TOKEN, MONGODBPipeline
 import misc.stock_processing as ms
 import pymongo
+from stop_words import get_stop_words
+from collections import Counter, OrderedDict
 # App config
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -16,7 +18,6 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 # Create Database Stock
 db = MONGODBPipeline()
-
 # -------- Route to Manipulate Collection Infos --------
 # API CIC(Collection Infos Create)
 
@@ -296,7 +297,14 @@ def nlp():
     symbol = request.args['symbol']
     twits = [ms.regex(i['body']) for i in db.twits.find(
         {"symbols": {"$elemMatch": {"$eq": symbol}}}, projection={"_id": 0, "id": 0, "reshares": 0})]
-    return jsonify({'twits': twits})
+    words = reduce(lambda x, y: x + y, twits)
+    stopW = get_stop_words('english')
+    clean_words = Counter()
+    for key, value in words.iteritems():
+        print(key, value)
+        if not key.lower() in stopW and key.isalpha() and len(key) >= 2:
+            clean_words[key] = value
+    return jsonify({'words': OrderedDict(clean_words.most_common(25))})
 # # : Route for testing hotness function
 #
 #
