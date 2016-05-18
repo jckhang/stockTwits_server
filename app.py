@@ -18,6 +18,10 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 # Create Database Stock
 db = MONGODBPipeline()
+# Stopwords
+stopW = set(get_stop_words('english'))
+stopW.update(['will', 'can', 'just', 'www', 'com'])
+
 # -------- Route to Manipulate Collection Infos --------
 # API CIC(Collection Infos Create)
 
@@ -298,12 +302,11 @@ def nlp():
     twits = [ms.regex(i['body']) for i in db.twits.find(
         {"symbols": {"$elemMatch": {"$eq": symbol}}}, projection={"_id": 0, "id": 0, "reshares": 0})]
     words = reduce(lambda x, y: x + y, twits)
-    stopW = get_stop_words('english')
     clean_words = Counter()
     for key, value in words.iteritems():
         print(key, value)
         if not key.lower() in stopW and key.isalpha() and len(key) >= 2:
-            clean_words[key] = value
+            clean_words[key[0].upper() + key[1:]] = value
     return jsonify({'words': OrderedDict(clean_words.most_common(25))})
 # # : Route for testing hotness function
 #

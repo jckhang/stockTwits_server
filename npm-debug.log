@@ -7,7 +7,7 @@
 4 verbose stack Error: ENOENT: no such file or directory, open '/Users/zhangyuxiang/Projects/CUSP/2016spring/IV2016/project/stockTwits_server/package.json'
 4 verbose stack     at Error (native)
 5 verbose cwd /Users/zhangyuxiang/Projects/CUSP/2016spring/IV2016/project/stockTwits_server
-6 error Darwin 15.4.0
+6 error Darwin 15.5.0
 7 error argv "/usr/local/Cellar/node/5.0.0/bin/node" "/usr/local/bin/npm" "start"
 8 error node v5.0.0
 9 error npm  v3.7.3
