@@ -257,6 +257,7 @@ def twitsAPI():
             {"symbols": {"$elemMatch": {"$eq": name}}},
             projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(30)]
     return jsonify({'data': data})
+# Route for listing the price of each stocks in the past 24 hours.
 
 
 @app.route('/sparkline', methods=["GET"])
@@ -284,16 +285,27 @@ def not_found(error=None):
         'message': 'Not Found: ' + request.url,
     }
     return jsonify(message)
+
 # # # Testing
+# Route to test bag-of-word from symbol
+
+
+@app.route('/nlp', methods=["GET"])
+@cross_origin()
+def nlp():
+    symbol = request.args['symbol']
+    twits = [ms.regex(i['body']) for i in db.twits.find(
+        {"symbols": {"$elemMatch": {"$eq": symbol}}}, projection={"_id": 0, "id": 0, "reshares": 0})]
+    return jsonify({'twits': twits})
 # # : Route for testing hotness function
 #
 #
-@app.route("/hot", methods=['GET'])
-@cross_origin()
-def hot():
-    symbol = request.args['symbol']
-    hotness = ms.hotness_function(symbol)
-    return jsonify({('{} hotness'.format(symbol)): hotness})
+# @app.route("/hot", methods=['GET'])
+# @cross_origin()
+# def hot():
+#     symbol = request.args['symbol']
+#     hotness = ms.hotness_function(symbol)
+#     return jsonify({('{} hotness'.format(symbol)): hotness})
 # # Route for testing bs function
 #
 #

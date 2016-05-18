@@ -43,4 +43,4 @@ def regex(st):
     st_re = re.sub(r'(?i)\&\w+', "", st_re)
     # Remove https
     st_re = re.sub('((www\.[\s]+)|https?://[^\s]+)', "", st_re)
-    return st_re
+    return st_re.split(" ")
