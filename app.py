@@ -226,7 +226,8 @@ def createKeywords():
                 for key, value in words.iteritems():
                     if not key.lower() in stopW and key.isalpha() and len(key) >= 2:
                         clean_words[key[0].upper() + key[1:]] = value
-                item = {'name': symbol, 'data': OrderedDict(clean_words.most_common(25))}
+                item = {'name': symbol, 'data': OrderedDict(
+                    clean_words.most_common(25))}
                 try:
                     db.keywords.replace_one(item, item, True)
                 except pymongo.errors.DuplicateKeyError:
@@ -253,7 +254,8 @@ def updateKeywords():
             for key, value in words.iteritems():
                 if not key.lower() in stopW and key.isalpha() and len(key) >= 2:
                     clean_words[key[0].upper() + key[1:]] = value
-            item = {'name': symbol, 'data': OrderedDict(clean_words.most_common(25))}
+            item = {'name': symbol, 'data': OrderedDict(
+                clean_words.most_common(25))}
             try:
                 db.keywords.replace_one(item, item, True)
             except pymongo.errors.DuplicateKeyError:
@@ -331,7 +333,7 @@ def keywordsAPI():
 # Route for realted stocks
 
 
-@app.route('/related', method=["GET"])
+@app.route('/related', methods=["GET"])
 @cross_origin()
 def related():
     pass
