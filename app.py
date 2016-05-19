@@ -205,12 +205,44 @@ def deleteTwits():
                      })
     print('Collection Twits Deleted.')
     return Response('Collection Twits Deleted.')
-# API CKC(Collection Keyword Create)
+# API CKC(Collection Keywords Create)
 
 
 @app.route("/ckc")
-def createKeyword():
-    pass
+def createKeywords():
+    if db.keywords.count() == 0:
+        print("Creating Infos!!")
+        with open('static/sp100.json', 'rb') as f:
+            ls = json.load(f)
+            for i in ls:
+                if i['name']=="BRKB":
+                    symbol = "BRK.B"
+                else:
+                    symbol = i['name']
+                print(symbol)
+                twits = [ms.regex(i['body']) for i in db.twits.find(
+                    {"symbols": {"$elemMatch": {"$eq": symbol}}}, projection={"_id": 0, "id": 0, "reshares": 0})]
+                words = reduce(lambda x, y: x + y, twits)
+                clean_words = Counter()
+                for key, value in words.iteritems():
+                    if not key.lower() in stopW and key.isalpha() and len(key) >= 2:
+                        clean_words[key[0].upper() + key[1:]] = value
+                item = {'words': OrderedDict(clean_words.most_common(25))}
+                try:
+                    db.keywords.replace_one(item, item, True)
+                except pymongo.errors.DuplicateKeyError:
+                    pass
+    print('Collection Keywords Created.')
+    return Response('Collection Keywords Created.')
+# API CKU(Collection Keywords Update)
+# API CKD(Collection Keywords Delete)
+
+
+@app.route("/ckd")
+def deleteKeywords():
+    db.keywords.delete_many({})
+    print('Collection Keywords Deleted.')
+    return Response('Collection Keywords Deleted.')
 # ===============Route for API GET===============
 # Route for homepage
 
