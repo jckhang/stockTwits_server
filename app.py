@@ -328,6 +328,13 @@ def keywordsAPI():
     name = request.args['symbol']
     data = [i['data'] for i in db.keywords.find({'name': name})]
     return jsonify({'data': data})
+# Route for realted stocks
+
+
+@app.route('/related', method=["GET"])
+@cross_origin()
+def related():
+    pass
 # Route for listing the price of each stocks in the past 24 hours.
 
 
