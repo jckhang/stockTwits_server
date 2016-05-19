@@ -211,15 +211,14 @@ def deleteTwits():
 @app.route("/ckc")
 def createKeywords():
     if db.keywords.count() == 0:
-        print("Creating Infos!!")
+        print("Creating Keywords!!")
         with open('static/sp100.json', 'rb') as f:
             ls = json.load(f)
             for i in ls:
-                if i['name']=="BRKB":
+                if i['name'] == "BRKB":
                     symbol = "BRK.B"
                 else:
                     symbol = i['name']
-                print(symbol)
                 twits = [ms.regex(i['body']) for i in db.twits.find(
                     {"symbols": {"$elemMatch": {"$eq": symbol}}}, projection={"_id": 0, "id": 0, "reshares": 0})]
                 words = reduce(lambda x, y: x + y, twits)
@@ -227,7 +226,7 @@ def createKeywords():
                 for key, value in words.iteritems():
                     if not key.lower() in stopW and key.isalpha() and len(key) >= 2:
                         clean_words[key[0].upper() + key[1:]] = value
-                item = {'words': OrderedDict(clean_words.most_common(25))}
+                item = {'name': symbol, 'data': OrderedDict(clean_words.most_common(25))}
                 try:
                     db.keywords.replace_one(item, item, True)
                 except pymongo.errors.DuplicateKeyError:
@@ -235,6 +234,32 @@ def createKeywords():
     print('Collection Keywords Created.')
     return Response('Collection Keywords Created.')
 # API CKU(Collection Keywords Update)
+
+
+@app.route("/cku")
+def updateKeywords():
+    print("Updating Keywords!!")
+    with open("static/sp100.json", "rb") as f:
+        ls = json.load(f)
+        for i in ls:
+            if i['name'] == "BRKB":
+                symbol = "BRK.B"
+            else:
+                symbol = i['name']
+            twits = [ms.regex(i['body']) for i in db.twits.find(
+                {"symbols": {"$elemMatch": {"$eq": symbol}}}, projection={"_id": 0, "id": 0, "reshares": 0})]
+            words = reduce(lambda x, y: x + y, twits)
+            clean_words = Counter()
+            for key, value in words.iteritems():
+                if not key.lower() in stopW and key.isalpha() and len(key) >= 2:
+                    clean_words[key[0].upper() + key[1:]] = value
+            item = {'name': symbol, 'data': OrderedDict(clean_words.most_common(25))}
+            try:
+                db.keywords.replace_one(item, item, True)
+            except pymongo.errors.DuplicateKeyError:
+                pass
+    print("Collection Keywords Updated.")
+    return Response("Collection Keywords Updated.")
 # API CKD(Collection Keywords Delete)
 
 
@@ -294,6 +319,15 @@ def twitsAPI():
             {"symbols": {"$elemMatch": {"$eq": name}}},
             projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(30)]
     return jsonify({'data': data})
+# Route for searching specific symbol and return it's most common 25 keywords.
+
+
+@app.route('/keywords', methods=["GET"])
+@cross_origin()
+def keywordsAPI():
+    name = request.args['symbol']
+    data = [i['data'] for i in db.keywords.find({'name': name})]
+    return jsonify({'data': data})
 # Route for listing the price of each stocks in the past 24 hours.
 
 
@@ -324,22 +358,7 @@ def not_found(error=None):
     return jsonify(message)
 
 # # # Testing
-# Route to test bag-of-word from symbol
 
-
-@app.route('/nlp', methods=["GET"])
-@cross_origin()
-def nlp():
-    symbol = request.args['symbol']
-    twits = [ms.regex(i['body']) for i in db.twits.find(
-        {"symbols": {"$elemMatch": {"$eq": symbol}}}, projection={"_id": 0, "id": 0, "reshares": 0})]
-    words = reduce(lambda x, y: x + y, twits)
-    clean_words = Counter()
-    for key, value in words.iteritems():
-        print(key, value)
-        if not key.lower() in stopW and key.isalpha() and len(key) >= 2:
-            clean_words[key[0].upper() + key[1:]] = value
-    return jsonify({'words': OrderedDict(clean_words.most_common(25))})
 # # : Route for testing hotness function
 #
 #
