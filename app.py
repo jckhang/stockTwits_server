@@ -314,13 +314,13 @@ def searchAPI():
 def twitsAPI():
     if not('symbol' in request.args) or (request.args['symbol'] == 'all'):
         data = [i for i in db.twits.find(
-            {}, projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(30)]
+            {}, projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(50)]
         return jsonify({'data': data})
     else:
         name = request.args['symbol']
         data = [i for i in db.twits.find(
             {"symbols": {"$elemMatch": {"$eq": name}}},
-            projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(30)]
+            projection={"_id": 0, "id": 0, "reshares": 0}).sort('time', -1).limit(50)]
     return jsonify({'data': data})
 # Route for searching specific symbol and return it's most common 25 keywords.
 
