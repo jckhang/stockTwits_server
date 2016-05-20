@@ -66,6 +66,7 @@ def updateInfos():
         ls = json.load(f)
         for i in ls:
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            print (i['name'])
             symbol = Share(i['name'])
             item = {
                 'name': i['name'],
@@ -336,7 +337,9 @@ def keywordsAPI():
 @app.route('/related', methods=["GET"])
 @cross_origin()
 def related():
-    pass
+    symbol = request.args['symbol']
+    data = [i for i in db.twits.find({'symbols': {"elemMatch": {"$eq": symbol}}})]
+    return jsonify({'data': data})
 # Route for listing the price of each stocks in the past 24 hours.
 
 

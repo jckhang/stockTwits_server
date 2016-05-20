@@ -8,6 +8,7 @@ sched = BlockingScheduler()
 def scheduled_job():
     updateInfos()
     updateTwits()
+    updateKeywords()
     print('This job is run every weekday at 9 to 16.')
 
 
